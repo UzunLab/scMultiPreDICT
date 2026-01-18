@@ -2,30 +2,46 @@
 # scMultiPreDICT Python Dependencies
 # ============================================================================
 #
-# Installation:
-#   pip install -r requirements.txt
+# This project uses TWO Python environments:
 #
-# Note: These packages are required only for autoencoder-based dimensionality
-# reduction methods (scVI, PeakVI, MultiVI). The default PCA+LSI method does
-# not require Python dependencies.
+# 1. R Environment (with TensorFlow) - for neural network training via reticulate
+#    - Used by: 06_neural_network.R scripts
+#    - Key packages: tensorflow, keras
+#
+# 2. Python Environment (with PyTorch) - for scvi-tools autoencoders
+#    - Used by: python/train_autoencoders.py, metacell creation scripts
+#    - Key packages: scvi-tools, torch, scanpy
 #
 # ============================================================================
+# ENVIRONMENT 1: R + TensorFlow (for neural network training)
+# ============================================================================
+# These packages should be in your R environment (accessible via reticulate)
+# Tested versions (from r-bioc-43 conda environment):
 
-# Deep Learning Framework
-tensorflow>=2.13.0
+tensorflow==2.19.0
+keras==3.12.0
+numpy==2.3.4
+pandas==2.3.3
+scipy==1.16.3
 
-# Single-Cell Variational Inference
-scvi-tools>=1.0.0
+# ============================================================================
+# ENVIRONMENT 2: Python + PyTorch (for scvi-tools autoencoders)
+# ============================================================================
+# These packages are for autoencoder-based dimensionality reduction methods
+# (scVI, PeakVI, MultiVI). The default PCA+LSI method does not require these.
+# Tested versions (from python_env conda environment):
 
-# Single-Cell Analysis
-scanpy>=1.9.0
-anndata>=0.9.0
-muon>=0.1.5
+scvi-tools==1.4.0
+torch==2.9.1
+pytorch-lightning==2.6.0
+scanpy==1.11.5
+anndata==0.12.6
+muon==0.1.7
+torchmetrics==1.8.2
 
-# Numerical Computing
-numpy>=1.24.0
-pandas>=2.0.0
-scipy>=1.10.0
+# ============================================================================
+# Common Dependencies
+# ============================================================================
 
 # Model Interpretation
 shap>=0.42.0
