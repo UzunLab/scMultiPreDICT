@@ -1,4 +1,6 @@
-# scMultiPreDICT:scMultiPreDICT: A single-cell predictive framework with transcriptomic and epigenetic signatures
+# scMultiPreDICT
+
+**scMultiPreDICT: A single-cell predictive framework with transcriptomic and epigenetic signatures**
 
 ## Overview
 
