@@ -280,7 +280,7 @@ cd combined/slurm/templates
 sbatch train_models.sbatch      # Linear and tree-based models
 sbatch train_nn.sbatch          # Neural network models
 ```
-# OR to automatically generate sbatch files
+ OR automatically generate sbatch files
 ```r
 Rscript -e 'source("config.R"); generate_all_sbatch()' 
 ```
