@@ -239,7 +239,7 @@ scMultiPreDICT/
 | Step | Script | Description |
 |------|--------|-------------|
 | 1 | `01_quality_control.R` | Cell filtering based on RNA and ATAC quality metrics |
-| 2 | `02_data_splitting.R` | Stratified splitting into training, validation, and test sets (70/15/15) |
+| 2 | `02_data_splitting.R` | Stratified splitting into training, validation, and test sets (70/20/10) |
 | 2b | `02b_select_target_genes.R` | Target gene selection (optional if using pre-computed gene lists) |
 | 3 | `03_metacell_creation.R` | Metacell construction via k-nearest neighbor smoothing |
 | 3b | `03b_export_to_mudata.R` | Export to MuData format for Python-based autoencoder training |
