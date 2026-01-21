@@ -34,7 +34,7 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/scMultiPreDICT.git
+git clone https://github.com/UzunLab/scMultiPreDICT.git
 cd scMultiPreDICT
 ```
 
