@@ -39,7 +39,7 @@ suppressPackageStartupMessages({
 # Update BASE_RESULTS_DIR to point to your scMultiPreDICT output directory
 
 BASE_RESULTS_DIR <- "~/scMultiPreDICT_output/results/models"
-DIMRED_METHOD <- "pca_lsi"       # Options: "pca_lsi", "wnn", "scvi_peakvi", "multivi"
+DIMRED_METHOD <- "pca_lsi"      
 GENE_SET <- "HVG"                # Options: "HVG", "Random_genes"
 
 cfg <- tibble::tribble(
@@ -333,4 +333,4 @@ purrr::pwalk(cfg, function(Dataset, BasePath, Genes) {
   }
 })
 
-message("\n✅ Done! Check folder: ", out_dir)
+message("\n Done! Check folder: ", out_dir)

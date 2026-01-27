@@ -6,7 +6,7 @@ message: "If you use this software, please cite it using the metadata below."
 
 title: "scMultiPreDICT: A Computational Framework for Predicting Gene Expression from Single-Cell Multiome Data"
 version: 1.0.0
-date-released: 2025-01-14
+date-released: 2026-01-19
 license: MIT
 type: software
 
@@ -14,8 +14,8 @@ repository-code: "https://github.com/yourusername/scMultiPreDICT"
 url: "https://github.com/yourusername/scMultiPreDICT"
 
 authors:
-  - family-names: "Manful"
-    given-names: "Ewura-Esi"
+  - family-names: "Uzun"
+    given-names: "Lab"
     # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"  # TODO: Add your ORCID
     affiliation: "Pennsylvania State University"
 

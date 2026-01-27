@@ -1,4 +1,4 @@
-# Step_060.Feature_Extraction_Automated_ATAC_only.R
+# Step_040.Feature_Extraction_Automated_ATAC_only.R
 # Automated: Gene-Specific Feature Extraction (ATAC-ONLY)
 # Loads all parameters and paths from config.R. No hardcoded logic.
 
@@ -651,4 +651,4 @@ cat("  ✓ All feature matrices are in (cells × features) format ready for mode
 cat("  ✓ HVGs computed from TRAINING data only (Nov 11, 2025 fix)\n")
 cat("  ✓ No information from validation/test used in target gene selection\n")
 
-cat("\nNext: Run Step_070.Model_Training.R with ATAC-only features\n")
+cat("\nNext: Run 05_linear_tree_models.R \n")

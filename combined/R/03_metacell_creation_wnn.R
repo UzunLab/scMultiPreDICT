@@ -1415,7 +1415,7 @@ dev.off()
 cat("  ✓ Saved combined PDF report (vector graphics)\n")
 
 cat("\n")
-cat("Publication-ready plots saved to:", plots_dir, "\n")
+cat("plots saved to:", plots_dir, "\n")
 cat("  - Each plot saved as both .png (600 dpi) and .pdf (vector)\n")
 cat("  - Combined report: Step_03_Metacell_Report_WNN.pdf\n")
 

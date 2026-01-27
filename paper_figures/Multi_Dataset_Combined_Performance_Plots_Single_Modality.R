@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # ============================================================================
-# Step_085_v2: Multi-Dataset Combined Performance Plots (Publication Ready)
+#  Multi-Dataset Combined Performance Plots (Publication Ready)
 # ============================================================================
 
 start_time <- Sys.time()
@@ -29,7 +29,7 @@ suppressPackageStartupMessages({
 
 MODALITY <- "rna_only"      # Options: "rna_only", "atac_only"
 BASE_RESULTS_DIR <- file.path("~/scMultiPreDICT_output", MODALITY, "results/models")
-DIMRED_METHOD <- "pca"       # Options: "pca", "scvi" for RNA; "lsi", "peakvi" for ATAC
+DIMRED_METHOD <- "lsi"     
 GENE_SET <- "HVG"            # Options: "HVG", "Random_genes"
 
 # Define samples to analyze

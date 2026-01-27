@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ============================================================================
-# Step_000: Dimensionality Reduction using Autoencoders (Automated)
+# Step_025: Dimensionality Reduction using Autoencoders (Automated)
 # ============================================================================
 # This script performs dimensionality reduction using:
 #   1. scVI for RNA data
@@ -14,7 +14,7 @@
 # Output: Latent representations for train/validation/test splits
 #
 # Usage:
-#   python Step_045.Dimensionality_Reduction_Autoencoders_Automated.py
+#   python Step_025.Dimensionality_Reduction_Autoencoders_Automated.py
 #
 # Note: Requires config.R to be parsed for paths. This script reads config
 #       values from environment variables or uses defaults.

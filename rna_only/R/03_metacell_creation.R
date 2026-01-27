@@ -1,5 +1,5 @@
 # ============================================================================
-# Step_050: Metacell Creation via k-NN Smoothing (scRNA-only, Automated)
+# Step_030: Metacell Creation via k-NN Smoothing (scRNA-only, Automated)
 # ============================================================================
 # This script creates metacells using k-NN smoothing in RNA PCA space.
 # Uses RNA data only from the multiome Seurat object (ignores ATAC).
@@ -16,7 +16,7 @@
 #
 # Usage:
 #   1. Edit config.R with your parameters
-#   2. Run: Rscript Step_050.Metacell_Creation_Automated.R
+#   2. Run: Rscript 03_metacell_creation.R
 # ============================================================================
 
 # Get the directory of this script to source config.R
@@ -88,8 +88,8 @@ split_colors_pub <- c(
   "test" = "#009E73"         # Green
 )
 
-# Publication theme
-theme_publication <- function(base_size = 12, base_family = "sans") {
+# Plotting theme
+theme_pub <- function(base_size = 12, base_family = "sans") {
   theme_bw(base_size = base_size, base_family = base_family) +
     theme(
       plot.title = element_text(size = base_size + 2, face = "bold", hjust = 0.5, 
@@ -115,8 +115,8 @@ theme_publication <- function(base_size = 12, base_family = "sans") {
     )
 }
 
-# Save publication plot function
-save_publication_plot <- function(plot, filename, width = 10, height = 8, dpi = 600, 
+# Save plot function
+save_plot <- function(plot, filename, width = 10, height = 8, dpi = 600, 
                                    create_pdf = TRUE) {
   ggsave(
     filename = paste0(filename, ".png"),
@@ -473,9 +473,9 @@ for (split_name in c("validation", "test")) {
 }
 
 # ============================================================================
-# GENERATE PUBLICATION-READY PLOTS
+# GENERATE PLOTS
 # ============================================================================
-cat("\n=== Generating publication-ready plots ===\n\n")
+cat("\n=== Generating plots ===\n\n")
 
 # ----------------------------------------------------------------------------
 # 1. PCA VARIANCE EXPLAINED (Scree Plot)
@@ -505,13 +505,13 @@ p_scree <- ggplot(scree_df, aes(x = PC)) +
     subtitle = sprintf("%s | %d HVGs | %d PCs", SAMPLE_NAME, N_VARIABLE_FEATURES, PCA_DIMS),
     caption = sprintf("Total variance captured: %.1f%%", cum_var[PCA_DIMS])
   ) +
-  theme_publication() +
+  theme_pub() +
   theme(
     axis.title.y.right = element_text(color = colorblind_palette[6]),
     axis.text.y.right = element_text(color = colorblind_palette[6])
   )
 
-save_publication_plot(p_scree, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_scree")),
+save_plot(p_scree, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_scree")),
                        width = 10, height = 6)
 
 # ----------------------------------------------------------------------------
@@ -540,10 +540,10 @@ p_pca12 <- ggplot(pca_plot_df, aes(x = PC1, y = PC2, color = split)) +
     title = "PCA Embedding by Data Split",
     subtitle = sprintf("%s | RNA-only | k=%d neighbors", SAMPLE_NAME, K_NEIGHBORS)
   ) +
-  theme_publication() +
+  theme_pub() +
   guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))
 
-save_publication_plot(p_pca12, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_pc1_pc2_by_split")),
+save_plot(p_pca12, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_pc1_pc2_by_split")),
                        width = 10, height = 8)
 
 # PC1 vs PC3
@@ -558,10 +558,10 @@ if (!all(is.na(pca_plot_df$PC3))) {
       title = "PCA Embedding (PC1 vs PC3)",
       subtitle = sprintf("%s | RNA-only", SAMPLE_NAME)
     ) +
-    theme_publication() +
+    theme_pub() +
     guides(color = guide_legend(override.aes = list(size = 3, alpha = 1)))
   
-  save_publication_plot(p_pca13, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_pc1_pc3_by_split")),
+  save_plot(p_pca13, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_pc1_pc3_by_split")),
                          width = 10, height = 8)
 }
 
@@ -583,10 +583,10 @@ p_pca_facet <- ggplot(pca_plot_df, aes(x = PC1, y = PC2, color = split)) +
     title = "PCA Embedding by Data Split (Faceted)",
     subtitle = sprintf("%s | RNA PCA | k=%d neighbors", SAMPLE_NAME, K_NEIGHBORS)
   ) +
-  theme_publication() +
+  theme_pub() +
   theme(legend.position = "none")
 
-save_publication_plot(p_pca_facet, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_faceted_by_split")),
+save_plot(p_pca_facet, file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_faceted_by_split")),
                        width = 14, height = 5)
 
 # ----------------------------------------------------------------------------
@@ -601,7 +601,7 @@ p_density_pc1 <- ggplot(pca_plot_df, aes(x = PC1, fill = split, color = split)) 
     y = "Density",
     title = "PC1 Distribution by Split"
   ) +
-  theme_publication()
+  theme_pub()
 
 p_density_pc2 <- ggplot(pca_plot_df, aes(x = PC2, fill = split, color = split)) +
   geom_density(alpha = 0.4, linewidth = 0.8) +
@@ -612,7 +612,7 @@ p_density_pc2 <- ggplot(pca_plot_df, aes(x = PC2, fill = split, color = split)) 
     y = "Density",
     title = "PC2 Distribution by Split"
   ) +
-  theme_publication()
+  theme_pub()
 
 p_density_combined <- p_density_pc1 + p_density_pc2 +
   plot_layout(guides = "collect") +
@@ -625,7 +625,7 @@ p_density_combined <- p_density_pc1 + p_density_pc2 +
     )
   )
 
-save_publication_plot(p_density_combined, 
+save_plot(p_density_combined, 
                        file.path(plots_dir, paste0(SAMPLE_NAME, "_pca_density_by_split")),
                        width = 14, height = 6)
 
@@ -660,10 +660,10 @@ p_var_reduction <- ggplot(var_df, aes(x = log10(raw + 1), y = log10(smoothed + 1
     caption = sprintf("Points below diagonal = variance reduction\nMedian reduction: %.1f%%",
                       (1 - median(var_df$var_ratio, na.rm = TRUE)) * 100)
   ) +
-  theme_publication() +
+  theme_pub() +
   coord_fixed()
 
-save_publication_plot(p_var_reduction, 
+save_plot(p_var_reduction, 
                        file.path(plots_dir, paste0(SAMPLE_NAME, "_smoothing_variance_reduction")),
                        width = 8, height = 8)
 
@@ -696,10 +696,10 @@ p_summary <- ggplot(summary_df, aes(x = Split, y = Cells, fill = Split)) +
     subtitle = sprintf("%s | RNA-only Metacell Creation", SAMPLE_NAME),
     caption = sprintf("Method: PCA + k-NN smoothing (k=%d, %d dims)", K_NEIGHBORS, PCA_DIMS)
   ) +
-  theme_publication() +
+  theme_pub() +
   theme(legend.position = "none")
 
-save_publication_plot(p_summary, 
+save_plot(p_summary, 
                        file.path(plots_dir, paste0(SAMPLE_NAME, "_split_summary")),
                        width = 8, height = 6)
 
@@ -741,4 +741,4 @@ cat(sprintf("  - %s_pca_density_by_split.pdf/png\n", SAMPLE_NAME))
 cat(sprintf("  - %s_smoothing_variance_reduction.pdf/png\n", SAMPLE_NAME))
 cat(sprintf("  - %s_split_summary.pdf/png\n", SAMPLE_NAME))
 
-cat("\nNext: Run Step_060.Feature_Extraction_Automated.R\n")
+cat("\nNext: Run 04_feature_extraction.R\n")

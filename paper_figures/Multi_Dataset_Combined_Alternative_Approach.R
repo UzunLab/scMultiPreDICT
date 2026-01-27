@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# Step_085: Multi-Dataset Combined Performance Plots (Linear/RF + DeepNN)
+# Multi-Dataset Combined Performance Plots (Linear/RF + DeepNN)
 # =============================================================================
 # Publication-oriented plotting of model performance across multiple datasets.
 #
@@ -15,7 +15,7 @@
 # - Summary CSV with per-dataset, per-model statistics
 #
 # Usage:
-#  Rscript Step_085_Multi_Dataset_Plots_Separate.R
+#  Rscript Multi_Dataset_Combined_Alternative_Approach.R
 # =============================================================================
 
 start_time <- Sys.time()

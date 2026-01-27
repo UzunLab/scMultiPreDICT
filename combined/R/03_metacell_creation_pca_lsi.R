@@ -990,7 +990,7 @@ p5d <- ggplot(density_df, aes(x = Expression, fill = Type, color = Type)) +
   labs(title = "Expression Density: Original vs Smoothed",
        subtitle = "Smoothing reduces sparsity and noise, especially for high-variance genes",
        x = "log₁p(CPM)", y = "Density") +
-  theme_publication() +
+  theme_pub() +
   theme(legend.position = "bottom")
 
 save_plot(p5d, file.path(plots_dir, "08b_expression_density_comparison"), 
@@ -1012,7 +1012,7 @@ p5e <- ggplot(zero_df, aes(x = Original, y = Smoothed)) +
   labs(title = "Dropout Reduction from k-NN Smoothing",
        subtitle = "Proportion of zero-expression cells per gene",
        x = "Original Zero Proportion", y = "Smoothed Zero Proportion") +
-  theme_publication() +
+  theme_pub() +
   annotate("text", x = 0.8, y = 0.2, 
            label = sprintf("Mean reduction:\n%.1f%% → %.1f%%", 
                            mean(zero_prop_original)*100, mean(zero_prop_smoothed)*100),
@@ -1088,7 +1088,7 @@ p5g <- ggplot(hm_df, aes(x = Cell, y = Gene, fill = Expression)) +
   labs(title = "Expression Heatmap: Original vs Smoothed",
        subtitle = sprintf("Top 50 variable genes × %d cells (z-scored)", length(sample_cells)),
        x = "Cells", y = "Genes") +
-  theme_publication(base_size = 10) +
+  theme_pub(base_size = 10) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.y = element_text(size = 5))

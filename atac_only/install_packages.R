@@ -1,8 +1,22 @@
 # scMultiPreDICT R Package Requirements
 # ============================================================================
 # Run this script to install all required R packages
-# Usage: source("install_packages.R") or Rscript install_packages.R
+#
+# Usage:
+#   Interactive: source("install_packages.R")
+#   Command line: Rscript install_packages.R --species=mouse
+#                 Rscript install_packages.R --species=human
+#                 Rscript install_packages.R  (skips species packages)
 # ============================================================================
+
+# Parse command-line arguments
+args <- commandArgs(trailingOnly = TRUE)
+species_arg <- NULL
+for (arg in args) {
+  if (grepl("^--species=", arg)) {
+    species_arg <- sub("^--species=", "", arg)
+  }
+}
 
 cat("============================================\n")
 cat("Installing scMultiPreDICT R Dependencies\n")
@@ -103,17 +117,35 @@ cat("For HUMAN data:\n")
 cat("  BiocManager::install('EnsDb.Hsapiens.v86')\n")
 cat("  BiocManager::install('BSgenome.Hsapiens.UCSC.hg38')\n\n")
 
-# Prompt for species
-species_choice <- readline(prompt = "Install species packages? (mouse/human/skip): ")
+# Determine species choice (command-line arg or interactive prompt)
+if (!is.null(species_arg)) {
+  species_choice <- species_arg
+  cat(sprintf("Species specified via command line: %s\n", species_choice))
+} else if (interactive()) {
+  species_choice <- readline(prompt = "Install species packages? (mouse/human/skip): ")
+} else {
+  cat("No --species argument provided. Skipping species packages.\n")
+  cat("To install, run: Rscript install_packages.R --species=mouse\n")
+  cat("             or: Rscript install_packages.R --species=human\n")
+  species_choice <- "skip"
+}
 
 if (tolower(species_choice) == "mouse") {
   cat("Installing mouse annotation packages...\n")
-  BiocManager::install("EnsDb.Mmusculus.v79", update = FALSE, ask = FALSE)
-  BiocManager::install("BSgenome.Mmusculus.UCSC.mm10", update = FALSE, ask = FALSE)
+  tryCatch({
+    BiocManager::install("EnsDb.Mmusculus.v79", update = FALSE, ask = FALSE)
+    BiocManager::install("BSgenome.Mmusculus.UCSC.mm10", update = FALSE, ask = FALSE)
+  }, error = function(e) {
+    cat(sprintf("WARNING: Failed to install mouse packages: %s\n", e$message))
+  })
 } else if (tolower(species_choice) == "human") {
   cat("Installing human annotation packages...\n")
-  BiocManager::install("EnsDb.Hsapiens.v86", update = FALSE, ask = FALSE)
-  BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update = FALSE, ask = FALSE)
+  tryCatch({
+    BiocManager::install("EnsDb.Hsapiens.v86", update = FALSE, ask = FALSE)
+    BiocManager::install("BSgenome.Hsapiens.UCSC.hg38", update = FALSE, ask = FALSE)
+  }, error = function(e) {
+    cat(sprintf("WARNING: Failed to install human packages: %s\n", e$message))
+  })
 } else {
   cat("Skipping species packages. Install manually when needed.\n")
 }
@@ -150,10 +182,20 @@ cat("Session Information\n")
 cat("============================================\n")
 cat(sprintf("R version: %s\n", R.version.string))
 cat(sprintf("Platform: %s\n", R.version$platform))
-cat(sprintf("BiocManager version: %s\n", as.character(packageVersion("BiocManager"))))
-cat(sprintf("Seurat version: %s\n", as.character(packageVersion("Seurat"))))
-cat(sprintf("Signac version: %s\n", as.character(packageVersion("Signac"))))
+
+# Safely print package versions
+for (pkg in c("BiocManager", "Seurat", "Signac")) {
+  if (requireNamespace(pkg, quietly = TRUE)) {
+    cat(sprintf("%s version: %s\n", pkg, as.character(packageVersion(pkg))))
+  } else {
+    cat(sprintf("%s: NOT INSTALLED\n", pkg))
+  }
+}
 
 cat("\n============================================\n")
-cat("Installation Complete!\n")
+if (length(missing) > 0) {
+  cat("Installation Complete (with warnings)\n")
+} else {
+  cat("Installation Complete!\n")
+}
 cat("============================================\n")

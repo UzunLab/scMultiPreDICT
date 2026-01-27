@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # ============================================================================
-# Step_085_v2: Multi-Dataset Combined Performance Plots (Publication Ready)
+# Multi-Dataset Combined Performance Plots (Publication Ready)
 # ============================================================================
 
 start_time <- Sys.time()
@@ -28,7 +28,7 @@ suppressPackageStartupMessages({
 # Update BASE_RESULTS_DIR to point to your scMultiPreDICT output directory
 
 RNA_RESULTS_DIR <- "~/scMultiPreDICT_output/rna_only/results/models"
-RNA_METHOD <- "pca"              # Options: "pca", "scvi"
+RNA_METHOD <- "pca"              
 GENE_SET <- "HVG"                # Options: "HVG", "Random_genes"
 
 # Define samples to analyze

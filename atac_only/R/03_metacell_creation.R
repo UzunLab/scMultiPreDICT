@@ -1,4 +1,4 @@
-# Step_050.Metacell_Creation_Automated_ATAC_only.R
+# Step 030: Automated Metacell Creation via KNN Smoothing (ATAC-ONLY)
 # Automated Metacell Creation via KNN Smoothing (ATAC-ONLY, LSI-based)
 # Purpose: Denoise single-cell ATAC data by smoothing in LSI space using
 #          cell-wise k-NN weights computed within each split (train/val/test).
@@ -19,7 +19,7 @@
 #
 # USAGE:
 #  - Edit `config.R` to set `INPUT_SEURAT_SPLITS` and `ATAC_METACELL_OUTPUT_DIR`.
-#  - Run: `Rscript Step_050.Metacell_Creation_Automated_ATAC_only.R`
+#  - Run: `Rscript 03_metacell_creation.R`
 #
 # References: Signac/Seurat functions used: FindTopFeatures, RunTFIDF, RunSVD/RunLSI
 

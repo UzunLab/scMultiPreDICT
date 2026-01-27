@@ -1,10 +1,10 @@
 # ============================================================================
-# Step_060: Gene-Specific Feature Extraction (scRNA-only, Automated)
+# Step_040: Gene-Specific Feature Extraction (scRNA-only, Automated)
 # ============================================================================
 # This script extracts HVG expression features for predicting target gene
 # expression. Uses RNA data only (no ATAC peaks).
 #
-# Input: Smoothed metacell data from Step_050
+# Input: Smoothed metacell data from Step_030 (k-NN smoothing)
 # Output: Gene-specific feature matrices for train/val/test splits
 #
 # Features:
@@ -15,7 +15,7 @@
 #
 # Usage:
 #   1. Edit config.R with your parameters
-#   2. Run: Rscript Step_060.Feature_Extraction_Automated.R
+#   2. Run: Rscript 04_feature_extraction.R
 # ============================================================================
 
 # Get the directory of this script to source config.R
@@ -57,8 +57,8 @@ suppressPackageStartupMessages({
 })
 
 # If publication helpers are not available, define safe fallbacks here.
-if (!exists("theme_publication") || !is.function(theme_publication)) {
-  theme_publication <- function(base_size = 12) {
+if (!exists("theme_pub") || !is.function(theme_pub)) {
+  theme_pub <- function(base_size = 12) {
     theme_minimal(base_size = base_size) +
       theme(
         plot.title = element_text(face = "bold", size = base_size + 2),
@@ -70,8 +70,8 @@ if (!exists("theme_publication") || !is.function(theme_publication)) {
   }
 }
 
-if (!exists("save_publication_plot") || !is.function(save_publication_plot)) {
-  save_publication_plot <- function(plot, filename, width = 7, height = 5, dpi = 600) {
+if (!exists("save_plot") || !is.function(save_plot)) {
+  save_plot <- function(plot, filename, width = 7, height = 5, dpi = 600) {
     pdf_file <- paste0(filename, ".pdf")
     png_file <- paste0(filename, ".png")
     # Try to save PDF via Cairo where available
@@ -89,7 +89,7 @@ if (!exists("save_publication_plot") || !is.function(save_publication_plot)) {
 }
 
 # ============================================================================
-# PUBLICATION-READY PLOTTING SETUP
+# PLOTTING SETUP
 # ============================================================================
 
 # Colorblind-friendly palette (Wong 2011)
@@ -414,9 +414,9 @@ for (set_name in names(gene_sets)) {
 }
 
 # ============================================================================
-# GENERATE PUBLICATION-READY PLOTS
+# GENERATE PLOTS
 # ============================================================================
-cat("\n=== Generating publication-ready plots ===\n\n")
+cat("\n=== Generating plots ===\n\n")
 
 # Combine all gene set summaries
 if (length(all_gene_sets_summary) > 0) {
@@ -439,12 +439,12 @@ if (length(all_gene_sets_summary) > 0) {
       title = "Target Gene Expression Distribution",
       subtitle = sprintf("%s | Training data", SAMPLE_NAME)
     ) +
-    theme_publication() +
+    theme_pub() +
     facet_wrap(~ gene_set, ncol = 2)
   
-  save_publication_plot(p_expr_dist, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_target_expression_distribution")),
-                        width = 12, height = 5)
+  save_plot(p_expr_dist, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_target_expression_distribution")),
+            width = 12, height = 5)
   
   # ----------------------------------------------------------------------------
   # 2. EXPRESSION VARIANCE DISTRIBUTION
@@ -458,12 +458,12 @@ if (length(all_gene_sets_summary) > 0) {
       title = "Target Gene Variance Distribution",
       subtitle = sprintf("%s | Training data", SAMPLE_NAME)
     ) +
-    theme_publication() +
+    theme_pub() +
     facet_wrap(~ gene_set, ncol = 2)
   
-  save_publication_plot(p_var_dist, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_target_variance_distribution")),
-                        width = 12, height = 5)
+  save_plot(p_var_dist, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_target_variance_distribution")),
+            width = 12, height = 5)
   
   # ----------------------------------------------------------------------------
   # 3. MEAN VS VARIANCE SCATTER
@@ -478,11 +478,11 @@ if (length(all_gene_sets_summary) > 0) {
       title = "Target Gene Mean vs Variance",
       subtitle = sprintf("%s | Training data", SAMPLE_NAME)
     ) +
-    theme_publication()
+    theme_pub()
   
-  save_publication_plot(p_mean_var, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_target_mean_vs_variance")),
-                        width = 10, height = 8)
+  save_plot(p_mean_var, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_target_mean_vs_variance")),
+            width = 10, height = 8)
   
   # ----------------------------------------------------------------------------
   # 4. FEATURE COUNT SUMMARY
@@ -508,12 +508,12 @@ if (length(all_gene_sets_summary) > 0) {
       title = "Target Genes per Gene Set",
       subtitle = sprintf("%s | HVG features: %d", SAMPLE_NAME, N_HVG_FEATURES)
     ) +
-    theme_publication() +
+    theme_pub() +
     theme(legend.position = "none")
   
-  save_publication_plot(p_feature_count, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_target_genes_per_set")),
-                        width = 8, height = 6)
+  save_plot(p_feature_count, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_target_genes_per_set")),
+            width = 8, height = 6)
   
   # ----------------------------------------------------------------------------
   # 5. SAMPLE FEATURE MATRIX HEATMAP (first 20 genes, first 50 cells)
@@ -545,16 +545,16 @@ if (length(all_gene_sets_summary) > 0) {
           title = sprintf("Sample Feature Matrix: %s", first_gene$gene_name),
           subtitle = sprintf("First 50 cells × 20 HVG features")
         ) +
-        theme_publication() +
+        theme_pub() +
         theme(
           axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 6),
           axis.text.y = element_blank(),
           axis.ticks.y = element_blank()
         )
       
-      save_publication_plot(p_heatmap, 
-                            file.path(plots_dir, paste0(SAMPLE_NAME, "_sample_feature_matrix")),
-                            width = 12, height = 8)
+      save_plot(p_heatmap, 
+                file.path(plots_dir, paste0(SAMPLE_NAME, "_sample_feature_matrix")),
+                width = 12, height = 8)
     }
   }
 }
@@ -564,7 +564,7 @@ if (length(all_gene_sets_summary) > 0) {
 # ============================================================================
 cat("\n")
 cat("=", rep("=", 70), "\n", sep = "")
-cat("STEP 060 COMPLETE (scRNA-only)\n")
+cat("STEP 040 COMPLETE (scRNA-only)\n")
 cat("=", rep("=", 70), "\n\n", sep = "")
 
 cat("Gene-specific HVG expression features extracted successfully\n\n")
@@ -609,4 +609,4 @@ cat("  ✓ Target gene is EXCLUDED from HVG features to prevent data leakage\n")
 cat("  ✓ HVGs computed from TRAINING data only\n")
 cat("  ✓ All feature matrices are in (cells × features) format\n")
 
-cat("\nNext: Run Step_070.Model_Training_Automated.R\n")
+cat("\nNext: Run 05_linear_tree_models.R\n")

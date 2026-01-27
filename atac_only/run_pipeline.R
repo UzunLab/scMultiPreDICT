@@ -59,14 +59,11 @@ Options:
   --help           Show this help message
 
 Steps:
-  1: Quality Control
-  2: Data Splitting & Target Gene Selection
-  3: Metacell Creation (PCA+LSI)
+  3: Metacell Creation (LSI)
   4: Feature Extraction
   5: Model Training (Linear + RF)
   6: Neural Network Training
-  7: Results Aggregation
-  8: Plotting
+
 
 Example:
   Rscript run_pipeline.R --config my_config.R --steps 1,2,3
@@ -108,10 +105,6 @@ cat(sprintf("\nSteps to run: %s\n", paste(steps_to_run, collapse = ", ")))
 
 # Define step information
 step_info <- list(
-  list(name = "Quality Control", 
-       script = "R/01_quality_control.R"),
-  list(name = "Data Splitting & Target Genes", 
-       script = "R/02_data_splitting.R"),
   list(name = "Metacell Creation", 
        script = "R/03_metacell_creation.R"),
   list(name = "Feature Extraction", 
@@ -119,11 +112,7 @@ step_info <- list(
   list(name = "Model Training", 
        script = "R/05_linear_tree_models.R"),
   list(name = "Neural Network Training", 
-       script = "R/06_neural_network.R"),
-  list(name = "Results Aggregation", 
-       script = "R/07_aggregate_results.R"),
-  list(name = "Plotting", 
-       script = "R/08_plot_results.R")
+       script = "R/06_neural_network.R")
 )
 
 # Track timing
@@ -184,12 +173,9 @@ cat(sprintf("\nTotal time: %.1f minutes (%.1f hours)\n",
             as.numeric(total_time), as.numeric(total_time) / 60))
 
 cat("\n--- Output Locations ---\n")
-cat(sprintf("  QC data:     %s\n", OUTPUT_SEURAT_DIR))
-cat(sprintf("  Split info:  %s\n", OUTPUT_SPLITS_DIR))
 cat(sprintf("  Metacells:   %s\n", OUTPUT_METACELLS_DIR))
 cat(sprintf("  Features:    %s\n", OUTPUT_FEATURES_DIR))
 cat(sprintf("  Models:      %s\n", OUTPUT_MODELS_LINEAR_DIR))
 cat(sprintf("  Results:     %s\n", OUTPUT_MODELS_LINEAR_DIR))
-cat(sprintf("  Plots:       %s\n", OUTPUT_FIGURES_DIR))
 
 cat("\n")

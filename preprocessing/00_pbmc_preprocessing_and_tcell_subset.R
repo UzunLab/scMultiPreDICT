@@ -349,7 +349,16 @@ print(seurat_subset)
 
 
 # Call peaks
-peaks_output_dir <- file.path(OUTPUT_DIR, \"peaks_t_cells_output\")\ndir.create(peaks_output_dir, recursive = TRUE, showWarnings = FALSE)\n\npeaks_subset <- CallPeaks(\n  object = seurat_subset,\n  assay = \"ATAC\",\n  name = \"t_cells\",\n  macs2.path = \"/ri/shared/modules8/MACS2/2.2.9.1/bin/macs2\",  # Update this path for your system\n  outdir = peaks_output_dir\n)
+peaks_output_dir <- file.path(OUTPUT_DIR, "peaks_t_cells_output")
+dir.create(peaks_output_dir, recursive = TRUE, showWarnings = FALSE)
+
+peaks_subset <- CallPeaks(
+  object = seurat_subset,
+  assay = "ATAC",
+  name = "t_cells",
+  macs2.path = "/ri/shared/modules8/MACS2/2.2.9.1/bin/macs2",  # Update this path for your system
+  outdir = peaks_output_dir
+)
 
 peaks_subset <- keepStandardChromosomes(peaks_subset, pruning.mode = "coarse")
 if (exists("blacklist_hg38_unified")) {

@@ -1,5 +1,5 @@
 # ============================================================================
-# Step_071: Gene Expression Prediction - Deep Neural Network (ATAC-only)
+# Step_06: Gene Expression Prediction - Deep Neural Network (ATAC-only)
 # ============================================================================
 # This script trains deep neural networks to predict gene expression from
 # ATAC-derived features and mirrors the original `Step_071` structure so
@@ -12,7 +12,7 @@
 #  - Conda env with TensorFlow/Keras installed and accessible to reticulate.
 #
 # Usage:
-#   Rscript Step_071.Neural_Network_Automated_ATAC_only.R
+#   Rscript 06_neural_network.R
 # ============================================================================
 
 # Record start time
@@ -76,7 +76,7 @@ suppressPackageStartupMessages({
 })
 
 # ============================================================================
-# PUBLICATION-READY PLOTTING SETUP
+# PLOTTING SETUP
 # ============================================================================
 
 # Colorblind-friendly palette (Wong 2011)
@@ -109,7 +109,7 @@ split_colors <- c(
 )
 
 # Publication theme
-theme_publication <- function(base_size = 12, base_family = "sans") {
+theme_pub <- function(base_size = 12, base_family = "sans") {
   theme_bw(base_size = base_size, base_family = base_family) +
     theme(
       plot.title = element_text(size = base_size + 2, face = "bold", hjust = 0.5, 
@@ -135,7 +135,7 @@ theme_publication <- function(base_size = 12, base_family = "sans") {
     )
 }
 
-save_publication_plot <- function(plot, filename, width = 10, height = 8, dpi = 600, 
+save_plot <- function(plot, filename, width = 10, height = 8, dpi = 600, 
                                    create_pdf = TRUE) {
   ggsave(
     filename = paste0(filename, ".png"),
@@ -685,12 +685,12 @@ aggregate_results <- function(results, output_dir, gene_set_name) {
 }
 
 # ============================================================================
-# PUBLICATION-READY SUMMARY PLOTS
+# SUMMARY PLOTS
 # ============================================================================
 
 generate_summary_plots <- function(all_results, output_dir) {
   
-  cat("\n=== Generating publication-ready summary plots ===\n\n")
+  cat("\n=== Generating summary plots ===\n\n")
   
   plots_dir <- file.path(output_dir, "plots")
   if (!dir.exists(plots_dir)) {
@@ -725,9 +725,9 @@ generate_summary_plots <- function(all_results, output_dir) {
                          median(test_results$R2, na.rm = TRUE)),
       caption = "Red line = median"
     ) +
-    theme_publication()
+    theme_pub()
   
-  save_publication_plot(p_r2_hist, 
+  save_plot(p_r2_hist, 
                          file.path(plots_dir, paste0(SAMPLE_NAME, "_nn_r2_histogram")),
                          width = 10, height = 6)
   
@@ -744,10 +744,10 @@ generate_summary_plots <- function(all_results, output_dir) {
       title = "Deep Neural Network: Performance by Split",
       subtitle = sprintf("%s | %s", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
     ) +
-    theme_publication() +
+    theme_pub() +
     theme(legend.position = "none")
   
-  save_publication_plot(p_r2_split, 
+  save_plot(p_r2_split, 
                          file.path(plots_dir, paste0(SAMPLE_NAME, "_nn_r2_by_split")),
                          width = 8, height = 6)
   
@@ -769,10 +769,10 @@ generate_summary_plots <- function(all_results, output_dir) {
       title = "Train vs Test Performance (Overfitting Check)",
       subtitle = sprintf("%s | Points below diagonal = overfitting", SAMPLE_NAME)
     ) +
-    theme_publication() +
+    theme_pub() +
     coord_fixed()
   
-  save_publication_plot(p_overfit, 
+  save_plot(p_overfit, 
                          file.path(plots_dir, paste0(SAMPLE_NAME, "_nn_train_vs_test_r2")),
                          width = 8, height = 8)
   
@@ -792,9 +792,9 @@ generate_summary_plots <- function(all_results, output_dir) {
                          median(test_results$Spearman, na.rm = TRUE)),
       caption = "Red line = median"
     ) +
-    theme_publication()
+    theme_pub()
   
-  save_publication_plot(p_sp_hist, 
+  save_plot(p_sp_hist, 
                          file.path(plots_dir, paste0(SAMPLE_NAME, "_nn_spearman_histogram")),
                          width = 10, height = 6)
   
@@ -810,9 +810,9 @@ generate_summary_plots <- function(all_results, output_dir) {
       title = "R² vs Spearman Correlation (Test Set)",
       subtitle = sprintf("%s | Deep Neural Network", SAMPLE_NAME)
     ) +
-    theme_publication()
+    theme_pub()
   
-  save_publication_plot(p_r2_sp, 
+  save_plot(p_r2_sp, 
                          file.path(plots_dir, paste0(SAMPLE_NAME, "_nn_r2_vs_spearman")),
                          width = 8, height = 8)
   
@@ -965,7 +965,7 @@ runtime <- difftime(end_time, start_time, units = "mins")
 
 cat("\n")
 cat("=", rep("=", 70), "\n", sep = "")
-cat("STEP 071 COMPLETE (ATAC-only)\n")
+cat("STEP 060 COMPLETE (ATAC-only)\n")
 cat("=", rep("=", 70), "\n\n", sep = "")
 
 cat(sprintf("Total runtime: %.2f minutes\n\n", as.numeric(runtime)))

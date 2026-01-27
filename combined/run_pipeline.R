@@ -70,8 +70,6 @@ Pipeline Steps:
   4: Feature Extraction
   5: Linear and Tree-Based Model Training
   6: Neural Network Training
-  7: Results Aggregation
-  8: Visualization
 
 Example:
   Rscript run_pipeline.R --config my_config.R --steps 1,2,3
@@ -202,6 +200,4 @@ cat(sprintf("  Data splits:     %s\n", OUTPUT_SPLITS_DIR))
 cat(sprintf("  Metacells:       %s\n", OUTPUT_METACELLS_DIR))
 cat(sprintf("  Features:        %s\n", OUTPUT_FEATURES_DIR))
 cat(sprintf("  Model results:   %s\n", OUTPUT_MODELS_LINEAR_DIR))
-cat(sprintf("  Figures:         %s\n", OUTPUT_FIGURES_DIR))
-
 cat("\n")

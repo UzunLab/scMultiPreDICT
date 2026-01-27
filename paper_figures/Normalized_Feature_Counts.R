@@ -29,7 +29,7 @@ cols <- c("RNA(Gene)" = "#377EB8", "ATAC(Peak)" = "#E41A1C")
 # IMPORTANT: These folders must contain your 'coefficients.csv' or 'feature_importance.csv'
 
 BASE_RESULTS_DIR <- "~/scMultiPreDICT_output/results/models"
-DIMRED_METHOD <- "pca_lsi"       # Options: "pca_lsi", "wnn", "scvi_peakvi", "multivi"
+DIMRED_METHOD <- "pca_lsi"       # "pca_lsi"
 GENE_SET <- "HVG"                # Options: "HVG", "Random_genes"
 
 # Define samples to analyze

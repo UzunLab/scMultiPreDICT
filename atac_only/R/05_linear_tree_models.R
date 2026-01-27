@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Step_070.Model_Training_Automated.R
+# Step_050.Model_Training_Automated.R
 # Automated: Gene Expression Prediction Model Training (config-driven)
 # - Sources `config.R` for all parameters and paths
 # - Processes gene sets produced by Step_060
@@ -68,7 +68,7 @@ cat(sprintf("  Parallel cores: %d\n", NUM_CORES))
 
 
 # ============================================================================
-# PUBLICATION-READY PLOTTING SETUP
+#  PLOTTING SETUP
 # ============================================================================
 
 # Colorblind-friendly palette (Wong 2011)
@@ -99,7 +99,7 @@ geneset_colors <- c(
 )
 
 # Publication theme
-theme_publication <- function(base_size = 12, base_family = "sans") {
+theme_pub <- function(base_size = 12, base_family = "sans") {
   theme_bw(base_size = base_size, base_family = base_family) +
     theme(
       plot.title = element_text(size = base_size + 2, face = "bold", hjust = 0.5, 
@@ -125,7 +125,7 @@ theme_publication <- function(base_size = 12, base_family = "sans") {
     )
 }
 
-save_publication_plot <- function(plot, filename, width = 10, height = 8, dpi = 600, 
+save_plot <- function(plot, filename, width = 10, height = 8, dpi = 600, 
                                   create_pdf = TRUE) {
   ggsave(
     filename = paste0(filename, ".png"),
@@ -535,9 +535,9 @@ for (gene_set in gene_sets_to_process) {
 }
 
 # ============================================================================
-# GENERATE PUBLICATION-READY SUMMARY PLOTS
+# GENERATE SUMMARY PLOTS
 # ============================================================================
-cat("\n=== Generating publication-ready summary plots ===\n\n")
+cat("\n=== Generating summary plots ===\n\n")
 
 plots_dir <- file.path(OUTPUT_MODELS_LINEAR_DIR, "plots")
 if (!dir.exists(plots_dir)) {
@@ -567,12 +567,12 @@ if (nrow(combined_results) > 0 && "R2" %in% colnames(combined_results)) {
       subtitle = sprintf("%s | %s | n=%d genes", SAMPLE_NAME, DIMRED_METHOD_SUFFIX, 
                          length(unique(test_results$Gene)))
     ) +
-    theme_publication() +
+    theme_pub() +
     theme(legend.position = "none",
           axis.text.x = element_text(angle = 45, hjust = 1))
   
-  save_publication_plot(p_r2_box, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_r2_by_model_boxplot")),
+  save_plot(p_r2_box, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_r2_by_model_boxplot")),
                         width = 10, height = 6)
   
   # ----------------------------------------------------------------------------
@@ -590,12 +590,12 @@ if (nrow(combined_results) > 0 && "R2" %in% colnames(combined_results)) {
         title = "Model Performance by Gene Set (Test Set)",
         subtitle = sprintf("%s | %s", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
       ) +
-      theme_publication() +
+      theme_pub() +
       theme(legend.position = "none",
             axis.text.x = element_text(angle = 45, hjust = 1))
     
-    save_publication_plot(p_r2_facet, 
-                          file.path(plots_dir, paste0(SAMPLE_NAME, "_r2_by_model_geneset")),
+    save_plot(p_r2_facet, 
+              file.path(plots_dir, paste0(SAMPLE_NAME, "_r2_by_model_geneset")),
                           width = 14, height = 6)
   }
   
@@ -612,13 +612,13 @@ if (nrow(combined_results) > 0 && "R2" %in% colnames(combined_results)) {
       title = "Spearman Correlation by Model (Test Set)",
       subtitle = sprintf("%s | %s", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
     ) +
-    theme_publication() +
+    theme_pub() +
     theme(legend.position = "none",
           axis.text.x = element_text(angle = 45, hjust = 1))
   
-  save_publication_plot(p_sp_box, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_spearman_by_model_boxplot")),
-                        width = 10, height = 6)
+  save_plot(p_sp_box, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_spearman_by_model_boxplot")),
+            width = 10, height = 6)
   
   # ----------------------------------------------------------------------------
   # 4. TRAIN VS TEST R² (Overfitting Check)
@@ -638,12 +638,12 @@ if (nrow(combined_results) > 0 && "R2" %in% colnames(combined_results)) {
       title = "Train vs Test Performance (Overfitting Check)",
       subtitle = sprintf("%s | Points below diagonal = overfitting", SAMPLE_NAME)
     ) +
-    theme_publication() +
+    theme_pub() +
     coord_fixed()
   
-  save_publication_plot(p_overfit, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_train_vs_test_r2")),
-                        width = 10, height = 10)
+  save_plot(p_overfit, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_train_vs_test_r2")),
+            width = 10, height = 10)
   
   # ----------------------------------------------------------------------------
   # 5. BEST MODEL PER GENE
@@ -668,13 +668,13 @@ if (nrow(combined_results) > 0 && "R2" %in% colnames(combined_results)) {
       title = "Best Model per Gene (by Test R²)",
       subtitle = sprintf("%s | %s", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
     ) +
-    theme_publication() +
+    theme_pub() +
     theme(legend.position = "none",
           axis.text.x = element_text(angle = 45, hjust = 1))
   
-  save_publication_plot(p_best_model, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_best_model_per_gene")),
-                        width = 10, height = 6)
+  save_plot(p_best_model, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_best_model_per_gene")),
+            width = 10, height = 6)
   
   # ----------------------------------------------------------------------------
   # 6. R² HISTOGRAM
@@ -690,12 +690,12 @@ if (nrow(combined_results) > 0 && "R2" %in% colnames(combined_results)) {
       title = "Distribution of Test R² by Model",
       subtitle = sprintf("%s | %s", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
     ) +
-    theme_publication() +
+    theme_pub() +
     theme(legend.position = "none")
   
-  save_publication_plot(p_r2_hist, 
-                        file.path(plots_dir, paste0(SAMPLE_NAME, "_r2_histogram_by_model")),
-                        width = 14, height = 5)
+  save_plot(p_r2_hist, 
+            file.path(plots_dir, paste0(SAMPLE_NAME, "_r2_histogram_by_model")),
+            width = 14, height = 5)
   
   # ----------------------------------------------------------------------------
   # 7. SUMMARY STATISTICS TABLE
@@ -752,4 +752,4 @@ for (gene_set in gene_sets_to_process) {
 
 cat("\nPublication-ready plots saved in plots/ directory\n")
 
-cat("\nNext: Run Step_071.Neural_Network_Training_Automated.R\n")
+cat("\nNext: 06_neural_network.R \n")

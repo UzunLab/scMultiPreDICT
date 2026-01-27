@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # ============================================================================
-# Step_085_v2: Multi-Dataset Combined Performance Plots (Publication Ready)
+# Multi-Dataset Combined Performance Plots (Publication Ready)
 # ============================================================================
 
 start_time <- Sys.time()
