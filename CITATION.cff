@@ -4,7 +4,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 
-title: "scMultiPreDICT: A single-cell predictive framework with transcriptomic and epigenetic signatures"
+title: "scMultiPreDICT: A Computational Framework for Predicting Gene Expression from Single-Cell Multiome Data"
 version: 1.0.0
 date-released: 2026-01-19
 license: MIT
@@ -14,30 +14,30 @@ repository-code: "https://github.com/yourusername/scMultiPreDICT"
 url: "https://github.com/yourusername/scMultiPreDICT"
 
 authors:
-  - family-names: "Manful"
-    given-names: "Ewura-Esi"
-    # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"  # TODO: Add your ORCID
-    affiliation: "Pennsylvania State University"
-
-authors:
   - family-names: "Uzun"
-    given-names: "Yasin"
+    given-names: "Lab"
     # orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"  # TODO: Add your ORCID
     affiliation: "Pennsylvania State University"
-
 
 keywords:
-  - single-cell multiomics
+  - single-cell genomics
+  - multiome sequencing
   - gene expression prediction
   - machine learning
+  - scRNA-seq
+  - scATAC-seq
   - chromatin accessibility
+  - transcriptomics
 
 abstract: >-
-  Motivation: Cellular responses to genetic perturbations depend on both transcriptional programs and the epigenetic landscape. While single-cell multiomics technologies enable simultaneous profiling of gene expression and chromatin accessibility, the relative contribution of each regulatory layer to gene expression remains unclear. Existing computational approaches focus on data integration and gene regulatory network inference but do not systematically compare the predictive performance of transcriptional versus epigenetic features on a gene-by-gene basis.
-Results: We present scMultiPreDICT, a computational framework for comparative predictive modeling of gene expression using single-cell multiomics data. scMultiPreDICT benchmarks RNA-only, ATAC-only and multimodal feature sets across six machine learning models from linear regression to deep learning approach across different biological datasets. We show that RNA-derived features generally provide strong predictive power, whereas chromatin accessibility alone yields a modest performance. Surprisingly, multimodal integration does not uniformly improve prediction accuracy; instead, its benefit is gene-specific and context-dependent. Feature importance analysis reveals that transcriptional features dominate for most genes, whereas chromatin accessibility contributes meaningfully for a subset of genes in specific cellular contexts. Overall, the results demonstrate that regulatory layers contribute differently to gene expression. scMultiPreDICT provides a systemic framework for identifying the relative contributions of transcriptional and epigenetic regulation across genes and cellular contexts, guiding the design of targeted perturbation studies and the prioritization of regulatory layers for therapeutic interventions.
-Availability and implementation: scMultiPreDICT is implemented in R and available at https://github.com/UzunLab/scMultiPreDICT/.
-Contact: yuzun@pennstatehealth@psu.edu
-Supplementary Information: Supplementary data are available online.
+  scMultiPreDICT is a computational framework for predicting gene expression
+  from single-cell multiome (joint RNA-seq and ATAC-seq) data. The framework
+  systematically evaluates multiple feature modalities (combined RNA+ATAC,
+  RNA-only, ATAC-only), metacell construction approaches (PCA+LSI, WNN,
+  scVI+PeakVI, MultiVI), and machine learning models (linear regression,
+  regularized regression, random forest, neural networks) to identify optimal
+  strategies for gene expression prediction from chromatin accessibility and
+  transcriptomic features.
 
 # preferred-citation:
 #   type: article

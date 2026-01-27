@@ -31,7 +31,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # Default settings
 config_path <- "config.R"
 start_step <- 1
-stop_step <- 6
+stop_step <- 8
 specific_steps <- NULL
 
 # Argument parsing
@@ -129,7 +129,7 @@ step_info <- list(
   list(name = "Data Splitting", 
        script = "R/02_data_splitting.R"),
   list(name = sprintf("Metacell Creation (%s)", DIM_REDUCTION_METHOD), 
-       script = "R/03_metacell_creation.R"),
+       script = metacell_script),
   list(name = "Feature Extraction", 
        script = "R/04_feature_extraction.R"),
   list(name = "Linear and Tree-Based Model Training", 

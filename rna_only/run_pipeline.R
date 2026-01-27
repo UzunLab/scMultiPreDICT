@@ -26,7 +26,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # Default settings
 config_path <- "config.R"
 start_step <- 1
-stop_step <- 6
+stop_step <- 8
 specific_steps <- NULL
 
 # Parse arguments
@@ -79,7 +79,7 @@ cat("╔════════════════════════
 cat("║                                                              ║\n")
 cat("║              scMultiPreDICT Pipeline Runner                  ║\n")
 cat("║                                                              ║\n")
-cat("║   Gene Expression Prediction from scRNA-ONLY Data             ║\n")
+cat("║   Gene Expression Prediction from Multiome Data             ║\n")
 cat("║                                                              ║\n")
 cat("╚══════════════════════════════════════════════════════════════╝\n")
 cat("\n")

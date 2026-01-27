@@ -13,7 +13,7 @@
 # SECTION 1: SAMPLE IDENTIFICATION
 # ============================================================================
 # Sample name - used for file naming and output organization
-SAMPLE_NAME <- "YOUR_SAMPLE_NAME"  # e.g., "E7.5_rep1", "T_Cells", "PBMC_10k"
+SAMPLE_NAME <- "E7.5_rep2"  # e.g., "E7.5_rep1", "T_Cells", "PBMC_10k"
 
 # Project name (optional, for documentation)
 PROJECT_NAME <- "YOUR_PROJECT_NAME"
@@ -25,18 +25,18 @@ PROJECT_NAME <- "YOUR_PROJECT_NAME"
 # Use absolute paths or paths relative to your home directory (~/)
 
 # RNA data paths (Matrix Market format)
-INPUT_MTX <- "/path/to/your/matrix.mtx.gz"
-INPUT_FEATURES <- "/path/to/your/features.tsv.gz"
-INPUT_BARCODES <- "/path/to/your/barcodes.tsv.gz"
+INPUT_MTX <- "matrix.mtx.gz"
+INPUT_FEATURES <- "features.tsv.gz"
+INPUT_BARCODES <- "barcodes.tsv.gz"
 
 # ATAC fragments file (must be sorted and indexed)
-INPUT_FRAGMENTS <- "/path/to/your/fragments.tsv.gz"
+INPUT_FRAGMENTS <- "E7.5_rep2_fragments.sorted.tsv.gz"
 
 # ============================================================================
 # SECTION 3: OUTPUT DIRECTORIES
 # ============================================================================
 # Base output directory - all outputs will be organized under this
-BASE_OUTPUT_DIR <- "~/scMultiPreDICT_output/processed/"
+BASE_OUTPUT_DIR <- "~/Trial/data/processed/"
 
 # ============================================================================
 # SECTION 3a: DIMENSIONALITY REDUCTION METHOD
@@ -157,8 +157,8 @@ SEED_METACELL <- 2025
 #   T_Cells:   "data/target_genes/T_Cells/target_genes_hvg_100.txt"
 #
 # Set to empty string "" to use auto-selection (Option 2)
-HVG_GENE_FILE <- ""
-RANDOM_GENE_FILE <- ""
+HVG_GENE_FILE <- "data/target_genes/E7.5_rep2/target_genes_hvg_100.txt"
+RANDOM_GENE_FILE <- "data/target_genes/E7.5_rep2/target_genes_random_100.txt"
 
 # ---- OPTION 2: Auto-selection Parameters (for NEW datasets) ----
 N_HVG_GENES <- 100               # Number of HVGs to use as target genes
@@ -323,6 +323,8 @@ print_output_directories <- function() {
   cat(sprintf("  Features:           %s\n", path.expand(OUTPUT_FEATURES_DIR)))
   cat(sprintf("  Linear Models:      %s\n", path.expand(OUTPUT_MODELS_LINEAR_DIR)))
   cat(sprintf("  Neural Networks:    %s\n", path.expand(OUTPUT_MODELS_NN_DIR)))
+  cat(sprintf("  SHAP Analysis:      %s\n", path.expand(OUTPUT_SHAP_DIR)))
+  cat(sprintf("  Figures:            %s\n\n", path.expand(OUTPUT_FIGURES_DIR)))
   
   cat("=" , rep("=", 70), "\n\n", sep = "")
 }

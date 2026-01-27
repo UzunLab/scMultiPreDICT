@@ -391,7 +391,7 @@ ncol(seurat_subset)
 seurat_subset@assays$ATAC@counts
 head(rownames(seurat_subset[["ATAC"]]))
 
-# Filter genes after cell filtering in at least 10% of cells
+# Filter genes after cell filtering (best practice)
 cat("\n=== Filtering low-expression genes ===\n\n")
 DefaultAssay(seurat_subset) <- "RNA"
 num_cells <- ncol(seurat_subset)

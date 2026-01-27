@@ -308,7 +308,7 @@ if (!is.null(hvg_genes) && length(hvg_genes) > 0) {
   gene_sets$HVG <- hvg_genes
 }
 if (!is.null(random_genes) && length(random_genes) > 0) {
-  gene_sets$Random <- random_genes
+  gene_sets$Random_genes <- random_genes
 }
 
 cat(sprintf("\nTotal gene sets to process: %d\n", length(gene_sets)))

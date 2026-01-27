@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
 # Update BASE_RESULTS_DIR to point to your scMultiPreDICT output directory
 
 BASE_RESULTS_DIR <- "~/scMultiPreDICT_output/rna_only/results/models"
-DIMRED_METHOD <- "pca"       # Options: "pca"
+DIMRED_METHOD <- "pca"       # Options: "pca", "scvi"
 GENE_SET <- "HVG"            # Options: "HVG", "Random_genes"
 
 # Define samples to analyze
