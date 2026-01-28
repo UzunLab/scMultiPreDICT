@@ -1,5 +1,5 @@
 # ============================================================================
-# Step_031: Data Preprocessing and Quality Control (Automated)
+# Step_01: Data Preprocessing and Quality Control (Automated)
 # ============================================================================
 # This script processes a single multiome dataset (RNA + ATAC) and applies
 # quality control filters. It reads configuration from config.R.

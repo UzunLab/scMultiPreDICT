@@ -1,5 +1,5 @@
 # ============================================================================
-# Step_035: Select Target Genes for Prediction (Automated)
+# Step_02b: Select Target Genes for Prediction (Automated)
 # ============================================================================
 # Purpose: Select random non-HVG genes to use as prediction targets
 # This runs AFTER Step_020 (splitting) but BEFORE Step_040 (feature extraction)
