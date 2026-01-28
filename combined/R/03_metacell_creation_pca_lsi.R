@@ -17,7 +17,7 @@
 #
 # Usage:
 #   1. Ensure config.R is properly configured
-#   2. Run: Rscript Step_030.Metacell_Creation_Automated.R
+#   2. Run: Rscript 03_metacell_creation_pca_lsi.R
 # ============================================================================
 
 # Get the directory of this script to source config.R
