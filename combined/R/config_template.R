@@ -13,7 +13,8 @@
 # SECTION 1: SAMPLE IDENTIFICATION
 # ============================================================================
 # Sample name - used for file naming and output organization
-SAMPLE_NAME <- "E7.5_rep2"  # e.g., "E7.5_rep1", "T_Cells", "PBMC_10k"
+# Examples: "E7.5_rep1", "E7.5_rep2", "T_Cells", "PBMC_10k"
+SAMPLE_NAME <- "YOUR_SAMPLE_NAME"  # <-- EDIT THIS
 
 # Project name (optional, for documentation)
 PROJECT_NAME <- "YOUR_PROJECT_NAME"
@@ -22,21 +23,28 @@ PROJECT_NAME <- "YOUR_PROJECT_NAME"
 # SECTION 2: INPUT DATA PATHS
 # ============================================================================
 # Paths to the raw data files (10X Genomics format)
-# Use absolute paths or paths relative to your home directory (~/)
+# Use ABSOLUTE paths. Replace the placeholders below with your actual paths.
+#
+# Example for a 10X Genomics multiome dataset:
+#   INPUT_MTX <- "/data/my_project/E7.5_rep2/filtered_feature_bc_matrix/matrix.mtx.gz"
+#   INPUT_FEATURES <- "/data/my_project/E7.5_rep2/filtered_feature_bc_matrix/features.tsv.gz"
+#   INPUT_BARCODES <- "/data/my_project/E7.5_rep2/filtered_feature_bc_matrix/barcodes.tsv.gz"
+#   INPUT_FRAGMENTS <- "/data/my_project/E7.5_rep2/atac_fragments.tsv.gz"
 
 # RNA data paths (Matrix Market format)
-INPUT_MTX <- "matrix.mtx.gz"
-INPUT_FEATURES <- "features.tsv.gz"
-INPUT_BARCODES <- "barcodes.tsv.gz"
+INPUT_MTX <- "/path/to/your/data/matrix.mtx.gz"           # <-- EDIT THIS
+INPUT_FEATURES <- "/path/to/your/data/features.tsv.gz"    # <-- EDIT THIS
+INPUT_BARCODES <- "/path/to/your/data/barcodes.tsv.gz"    # <-- EDIT THIS
 
 # ATAC fragments file (must be sorted and indexed)
-INPUT_FRAGMENTS <- "E7.5_rep2_fragments.sorted.tsv.gz"
+INPUT_FRAGMENTS <- "/path/to/your/data/fragments.tsv.gz"  # <-- EDIT THIS
 
 # ============================================================================
 # SECTION 3: OUTPUT DIRECTORIES
 # ============================================================================
 # Base output directory - all outputs will be organized under this
-BASE_OUTPUT_DIR <- "~/Trial/data/processed/"
+# Example: "~/scMultiPreDICT_output/combined/processed/"
+BASE_OUTPUT_DIR <- "/path/to/your/output/directory/"      # <-- EDIT THIS
 
 # ============================================================================
 # SECTION 3a: DIMENSIONALITY REDUCTION METHOD
@@ -66,7 +74,6 @@ DIMRED_METHOD_SUFFIX <- switch(
 # Steps 01-02: Common preprocessing (NOT method-specific)
 OUTPUT_SEURAT_DIR <- file.path(BASE_OUTPUT_DIR, "seurat_obj", SAMPLE_NAME)
 OUTPUT_SPLITS_DIR <- file.path(BASE_OUTPUT_DIR, "splits", SAMPLE_NAME)
-OUTPUT_TARGET_GENES_DIR <- file.path(BASE_OUTPUT_DIR, "target_genes", SAMPLE_NAME)
 OUTPUT_LATENT_DIR <- file.path(BASE_OUTPUT_DIR, "latent_spaces", SAMPLE_NAME)
 
 # Steps 03+: Method-specific outputs
@@ -144,35 +151,36 @@ SEED_METACELL <- 2025
 # SECTION 8: TARGET GENE CONFIGURATION
 # ============================================================================
 # Target genes define WHICH genes' expression to predict (the response variable Y).
+# You MUST provide pre-computed target gene files. The same gene lists must be
+# used across all three pipelines (combined, rna_only, atac_only) for fair comparison.
 #
-# ╔══════════════════════════════════════════════════════════════════════════╗
-# ║  OPTION 1: Use pre-computed files (REQUIRED for reproducing results)    ║
-# ║  OPTION 2: Auto-select (ONLY for analyzing NEW datasets)                ║
-# ╚══════════════════════════════════════════════════════════════════════════╝
-
-# ---- OPTION 1: Pre-computed Target Gene Files ----
-# For reproducing published results, use the provided files:
-#   E7.5_rep1: "data/target_genes/E7.5_rep1/target_genes_hvg_100.txt"
-#   E7.5_rep2: "data/target_genes/E7.5_rep2/target_genes_hvg_100.txt"
-#   T_Cells:   "data/target_genes/T_Cells/target_genes_hvg_100.txt"
+# Pre-computed files are provided in the repo under data/target_genes/.
+# Use ABSOLUTE paths to avoid working directory issues.
+# 
+# Example (replace /path/to/scMultiPreDICT with your actual repo path):
+#   HVG_GENE_FILE <- "/path/to/scMultiPreDICT/data/target_genes/E7.5_rep2/target_genes_hvg_100.txt"
+#   RANDOM_GENE_FILE <- "/path/to/scMultiPreDICT/data/target_genes/E7.5_rep2/target_genes_random_100.txt"
 #
-# Set to empty string "" to use auto-selection (Option 2)
-HVG_GENE_FILE <- "data/target_genes/E7.5_rep2/target_genes_hvg_100.txt"
-RANDOM_GENE_FILE <- "data/target_genes/E7.5_rep2/target_genes_random_100.txt"
+# Available datasets: E7.5_rep1, E7.5_rep2, T_Cells
+HVG_GENE_FILE <- "/path/to/scMultiPreDICT/data/target_genes/YOUR_SAMPLE/target_genes_hvg_100.txt"  # <-- EDIT THIS
+RANDOM_GENE_FILE <- "/path/to/scMultiPreDICT/data/target_genes/YOUR_SAMPLE/target_genes_random_100.txt"  # <-- EDIT THIS
 
-# ---- OPTION 2: Auto-selection Parameters (for NEW datasets) ----
-N_HVG_GENES <- 100               # Number of HVGs to use as target genes
-N_RANDOM_TARGET_GENES <- 100     # Number of random non-HVG genes
-TARGET_MIN_DETECTION <- 5        # Min % of cells expressing the gene
-TARGET_MAX_DETECTION <- 95       # Max % of cells expressing the gene
-TARGET_MIN_MEAN_EXPR <- 0.1      # Min mean expression (log-normalized)
-SEED_TARGET_GENES <- 2025        # Random seed for target gene selection
+# Number of HVG target genes (must match the gene list file)
+N_HVG_GENES <- 100
 
-# Path for auto-generated target gene list (created by Step 02b)
-TARGET_GENE_FILE <- file.path(OUTPUT_TARGET_GENES_DIR, 
-                               sprintf("target_genes_random_%d.txt", N_RANDOM_TARGET_GENES))
+SEED_FEATURES <- 123        # Random seed for feature extraction
 
-SEED_FEATURES <- 123        # Random seed for target gene selection
+# ---- OPTIONAL: Auto-selection for NEW datasets (advanced) ----
+# If you have a NEW dataset without pre-computed gene lists, you can run
+# the standalone script 02b_select_target_genes.R to generate them:
+#   Rscript R/02b_select_target_genes.R
+# This requires the following parameters:
+# N_RANDOM_TARGET_GENES <- 100     # Number of random non-HVG genes
+# TARGET_MIN_DETECTION <- 5        # Min % of cells expressing the gene
+# TARGET_MAX_DETECTION <- 95       # Max % of cells expressing the gene
+# TARGET_MIN_MEAN_EXPR <- 0.1      # Min mean expression (log-normalized)
+# SEED_TARGET_GENES <- 2025        # Random seed for target gene selection
+# OUTPUT_TARGET_GENES_DIR <- file.path(BASE_OUTPUT_DIR, "target_genes", SAMPLE_NAME)
 # ============================================================================
 # SECTION 9: AUTOENCODER LATENT SPACE PATHS (for multivi, scvi_peakvi methods)
 # ============================================================================
@@ -230,14 +238,6 @@ N_CORES <- 4                     # Default cores for local runs
 MAX_CORES_TRAINING <- 32         # Maximum cores for model training
 USE_DISK_BACKED <- FALSE         # Use disk-backed matrices for large datasets
 
-# Conda environment names
-CONDA_ENV_R <- "r-bioc-43"      # R/Bioconductor environment
-CONDA_ENV_PYTHON <- "python_env" # Python environment
-
-# SLURM settings
-SLURM_PARTITION <- "compute"
-SLURM_LOG_DIR <- "~/logs"
-
 # ============================================================================
 # SECTION 13: RESULTS OUTPUT DIRECTORIES
 # ============================================================================
@@ -254,24 +254,9 @@ NN_ARCH_LABEL <- switch(
   paste0(NN_N_HIDDEN_LAYERS, "_hidden_layer")
 )
 
-OUTPUT_MODELS_NN_DIR <- file.path(BASE_RESULTS_DIR, "models/NEURAL_NETWORKS", SAMPLE_NAME, DIMRED_METHOD_SUFFIX, NN_ARCH_LABEL)
+OUTPUT_MODELS_NN_DIR <- file.path(BASE_RESULTS_DIR, "models/NEURAL_NETWORKS", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
 OUTPUT_SHAP_DIR <- file.path(BASE_RESULTS_DIR, "shap_analysis", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
 OUTPUT_FIGURES_DIR <- file.path(BASE_RESULTS_DIR, "figures", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
-
-# ============================================================================
-# SLURM RESOURCE REQUIREMENTS (adjust based on your dataset size)
-# ============================================================================
-SLURM_RESOURCES <- list(
-  step_01 = list(cpus = 8, mem_gb = 64, time_hours = 4, job_name = "qc_preprocess"),
-  step_02b = list(cpus = 4, mem_gb = 32, time_hours = 1, job_name = "target_genes"),
-  step_020 = list(cpus = 4, mem_gb = 32, time_hours = 1, job_name = "data_split"),
-  step_025 = list(cpus = 8, mem_gb = 64, time_hours = 6, job_name = "train_autoencoder", gpu = TRUE, gpu_count = 1),
-  step_03b = list(cpus = 4, mem_gb = 64, time_hours = 1, job_name = "export_mudata"),
-  step_030 = list(cpus = 32, mem_gb = 256, time_hours = 8, job_name = "metacell"),
-  step_040 = list(cpus = 32, mem_gb = 256, time_hours = 12, job_name = "feature_extract"),
-  step_050 = list(cpus = 32, mem_gb = 128, time_hours = 12, job_name = "model_linear"),
-  step_060 = list(cpus = 16, mem_gb = 64, time_hours = 24, job_name = "model_nn")
-)
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -284,7 +269,6 @@ create_output_directories <- function() {
     OUTPUT_SPLITS_DIR,
     OUTPUT_METACELLS_DIR,
     OUTPUT_FEATURES_DIR,
-    OUTPUT_TARGET_GENES_DIR,
     OUTPUT_LATENT_DIR,
     OUTPUT_MODELS_LINEAR_DIR,
     OUTPUT_MODELS_NN_DIR,
@@ -315,7 +299,6 @@ print_output_directories <- function() {
   cat("COMMON DIRECTORIES (method-independent):\n")
   cat(sprintf("  Seurat Objects:     %s\n", path.expand(OUTPUT_SEURAT_DIR)))
   cat(sprintf("  Data Splits:        %s\n", path.expand(OUTPUT_SPLITS_DIR)))
-  cat(sprintf("  Target Genes:       %s\n", path.expand(OUTPUT_TARGET_GENES_DIR)))
   cat(sprintf("  Latent Spaces:      %s\n\n", path.expand(OUTPUT_LATENT_DIR)))
   
   cat("METHOD-SPECIFIC DIRECTORIES (organized by dimred method):\n")
@@ -419,199 +402,6 @@ validate_config <- function() {
   cat("Configuration validated successfully!\n")
 }
 
-#' Generate SLURM sbatch file for a pipeline step
-#' @param step_name Name of step (e.g., "010", "020")
-#' @param script_name Name of R/Python script to run
-#' @param output_dir Directory to save sbatch file (default: current directory)
-#' @param conda_env Conda environment name (default: from config)
-#' @param extra_args Additional arguments to pass to the script
-#' @param array_range Optional SLURM array range (e.g., "1-100")
-#' @param is_python Whether the script is Python (default: FALSE for R)
-generate_sbatch <- function(step_name, script_name, output_dir = ".", 
-                            conda_env = NULL, extra_args = "", 
-                            array_range = NULL, is_python = FALSE) {
-  
-  # Get resource settings
-  if (!step_name %in% names(SLURM_RESOURCES)) {
-    stop(sprintf("Unknown step: %s. Available: %s", 
-                 step_name, paste(names(SLURM_RESOURCES), collapse = ", ")))
-  }
-  res <- SLURM_RESOURCES[[step_name]]
-  
-  # Default conda environment
-  if (is.null(conda_env)) {
-    conda_env <- if (is_python) CONDA_ENV_PYTHON else CONDA_ENV_R
-  }
-  
-  # Format time
-  hours <- floor(res$time_hours)
-  minutes <- round((res$time_hours - hours) * 60)
-  time_str <- sprintf("%02d:%02d:00", hours, minutes)
-  
-  # Log directory
-  log_dir <- file.path(path.expand(SLURM_LOG_DIR), res$job_name)
-  
-  # Check if GPU is requested
-  use_gpu <- !is.null(res$gpu) && res$gpu
-  gpu_count <- if (!is.null(res$gpu_count)) res$gpu_count else 1
-  
-  # Build sbatch content
-  sbatch_lines <- c(
-    "#!/bin/bash",
-    sprintf("#SBATCH --job-name=%s_%s", res$job_name, SAMPLE_NAME),
-    sprintf("#SBATCH -p %s", if (use_gpu) "gpu" else SLURM_PARTITION),
-    sprintf("#SBATCH --time=%s", time_str),
-    sprintf("#SBATCH --output=%s/%%x_%%j.log", log_dir),
-    sprintf("#SBATCH --error=%s/%%x_%%j.err", log_dir),
-    "#SBATCH -N 1",
-    "#SBATCH --ntasks-per-node=1",
-    sprintf("#SBATCH -c %d", res$cpus),
-    sprintf("#SBATCH --mem=%dG", res$mem_gb)
-  )
-  
-  # Add GPU if requested
-  if (use_gpu) {
-    sbatch_lines <- c(sbatch_lines, sprintf("#SBATCH --gres=gpu:%d", gpu_count))
-  }
-  
-  # Add array if specified
-  if (!is.null(array_range)) {
-    sbatch_lines <- c(sbatch_lines, sprintf("#SBATCH --array=%s", array_range))
-  }
-  
-  sbatch_lines <- c(sbatch_lines, "", "set -euo pipefail", "")
-  
-  # Create log directory
-  sbatch_lines <- c(sbatch_lines,
-    "# Create log directory",
-    sprintf("mkdir -p \"%s\"", log_dir),
-    ""
-  )
-  
-  # Conda activation
-  sbatch_lines <- c(sbatch_lines,
-    "# Initialize and activate conda environment",
-    "source ~/miniconda3/etc/profile.d/conda.sh",
-    sprintf("conda activate %s", conda_env),
-    ""
-  )
-  
-  # Environment info
-  sbatch_lines <- c(sbatch_lines,
-    "# Print environment info",
-    "echo \"============================================\"",
-    "echo \"Job Information\"",
-    "echo \"============================================\"",
-    "echo \"Job ID: $SLURM_JOB_ID\"",
-    "echo \"Job Name: $SLURM_JOB_NAME\"",
-    sprintf("echo \"CPUs: %d\"", res$cpus),
-    sprintf("echo \"Memory: %dG\"", res$mem_gb),
-    "echo \"Conda Env: $CONDA_DEFAULT_ENV\"",
-    "echo \"Start Time: $(date)\"",
-    "echo \"============================================\"",
-    ""
-  )
-  
-  # Set R library paths if R script
-  if (!is_python) {
-    sbatch_lines <- c(sbatch_lines,
-      "# Set R library paths",
-      "export R_LIBS=\"$CONDA_PREFIX/lib/R/library\"",
-      "export R_LIBS_USER=\"$CONDA_PREFIX/lib/R/library\"",
-      "export R_LIBS_SITE=\"\"",
-      ""
-    )
-  }
-  
-  # Run script
-  if (is_python) {
-    run_cmd <- sprintf("python %s %s", script_name, extra_args)
-  } else {
-    run_cmd <- sprintf("Rscript %s %s", script_name, extra_args)
-  }
-  
-  sbatch_lines <- c(sbatch_lines,
-    "# Run the script",
-    run_cmd,
-    "",
-    "# Print completion",
-    "echo \"\"",
-    "echo \"Job completed at $(date)\"",
-    "echo \"Exit code: $?\""
-  )
-  
-  # Write to file
-  sbatch_filename <- file.path(output_dir, sprintf("%s_%s.sbatch", step_name, SAMPLE_NAME))
-  writeLines(sbatch_lines, sbatch_filename)
-  
-  cat(sprintf("Generated: %s\n", sbatch_filename))
-  cat(sprintf("  Resources: %d CPUs, %dG RAM, %s time\n", res$cpus, res$mem_gb, time_str))
-  
-  invisible(sbatch_filename)
-}
-
-#' Generate all sbatch files for the pipeline
-#' @param output_dir Directory to save sbatch files
-#' @param gene_set Which gene set to use: "HVG" or "Random_genes"
-#' @param output_dir Directory to write sbatch files to
-generate_all_sbatch <- function(output_dir = ".") {
-  cat("\n=== Generating SLURM sbatch files ===\n\n")
-  
-  # Step 01: QC and Preprocessing
-  generate_sbatch("step_01", "01_quality_control.R", output_dir)
-  
-  # Step 02b: Select Target Genes
-  generate_sbatch("step_02b", "02b_select_target_genes.R", output_dir)
-  
-  # Step 020: Data Splitting
-  generate_sbatch("step_020", "02_data_splitting.R", output_dir)
-  
-  # Step 03b: Export Seurat to MuData (required for Python steps)
-  generate_sbatch("step_03b", "03b_export_seurat_to_mudata.R", output_dir)
-  
-  # Step 025: Dimensionality Reduction with Autoencoders (Python - GPU)
-  # Build arguments for the Python script
-  train_autoencoder_input <- file.path(path.expand(OUTPUT_SPLITS_DIR), paste0(SAMPLE_NAME, "_seurat_obj_with_splits_mu.h5mu"))
-  train_autoencoder_output <- file.path(path.expand(OUTPUT_METACELLS_DIR), "Autoencoders_For_Dimensionality_Reduction_Projected")
-  train_autoencoder_args <- sprintf("--input '%s' --output-dir '%s' --sample-name '%s' --n-latent 30 --max-epochs 500",
-                          train_autoencoder_input, train_autoencoder_output, SAMPLE_NAME)
-  generate_sbatch("step_025", "train_autoencoders.py", 
-                  output_dir, conda_env = CONDA_ENV_PYTHON, is_python = TRUE, extra_args = train_autoencoder_args)
-  
-  # Step 030: Metacell Creation (linear method)
-  generate_sbatch("step_030", "03_metacell_creation_pca_lsi.R", output_dir)
-  
-  # Step 030 variants (uncomment the one you want to use):
-  # --- Autoencoder latent spaces ---
-  # generate_sbatch("step_030_multivi", "03_metacell_creation_multivi.R", output_dir)
-  # generate_sbatch("step_030_scvi_peakvi", "03_metacell_creation_scvi_peakvi.R", output_dir)
-  # --- WMN--
-  # generate_sbatch("step_030_split_independent", "03_metacell_creation_wnn.R", output_dir)
-  
-  # Step 040: Feature Extraction
-  generate_sbatch("step_040", "04_feature_extraction.R", output_dir)
-  
-  # Step 050: Linear/RF Models (uses parallel processing internally)
-  generate_sbatch("step_050", "05_linear_tree_models.R", output_dir)
-  
-  # Step 060: Neural Network
-  generate_sbatch("step_060", "06_neural_network.R", output_dir)
-  
-  cat("\nAll sbatch files generated in:", output_dir, "\n")
-  cat("\n=== Pipeline Submission Order ===\n")
-  cat("# Submit in order, waiting for each to complete:\n")
-  cat(sprintf("sbatch step_01_%s.sbatch      # QC and Preprocessing\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_02b_%s.sbatch     # Select Target Genes\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_020_%s.sbatch     # Data Splitting\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_03b_%s.sbatch     # Export to MuData for Python\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_025_%s.sbatch     # Optional: GPU autoencoder training\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_030_%s.sbatch     # Metacell Creation\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_040_%s.sbatch     # Feature Extraction\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_050_%s.sbatch     # Linear/Tree Models\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_060_%s.sbatch     # Neural Network\n", SAMPLE_NAME))
-  cat("\n")
-}
-
 # ============================================================================
 # AUTO-LOAD MESSAGE
 # ============================================================================
@@ -619,3 +409,7 @@ cat("\n[CONFIG] Loaded configuration for sample:", SAMPLE_NAME, "\n")
 cat("[CONFIG] Species:", SPECIES, "| Genome:", GENOME, "\n")
 cat("[CONFIG] Dimensionality Reduction:", DIM_REDUCTION_METHOD, "\n")
 cat("[CONFIG] Use print_config() for full configuration\n\n")
+
+
+# Flag to prevent re-sourcing when called via run_pipeline.R
+CONFIG_LOADED <- TRUE

@@ -29,8 +29,13 @@ COMBINED_PIPELINE_DIR <- "/path/to/combined/pipeline/output"
 INPUT_SEURAT_SPLITS <- file.path(COMBINED_PIPELINE_DIR, "splits", SAMPLE_NAME,
                                   paste0(SAMPLE_NAME, "_seurat_obj_with_splits.rds"))
 
-# Target gene directory (from combined pipeline)
-INPUT_TARGET_GENES_DIR <- file.path(COMBINED_PIPELINE_DIR, "target_genes", SAMPLE_NAME)
+# ============================================================================
+# SECTION 2b: RNA-ONLY PIPELINE OUTPUT PATH
+# ============================================================================
+# The ATAC-only feature extraction step needs smoothed RNA data as the
+# prediction target (Y variable). This comes from the RNA-only pipeline.
+# Set this to the BASE_OUTPUT_DIR of your RNA-only pipeline run.
+RNA_METACELL_DIR <- "~/scMultiPreDICT_output/rna_only/processed/"
 
 # ============================================================================
 # SECTION 3: OUTPUT DIRECTORIES
@@ -82,9 +87,11 @@ SEED_METACELL <- 2025
 # ============================================================================
 # SECTION 7: TARGET GENE CONFIGURATION
 # ============================================================================
-# Use the same target genes as the combined pipeline for fair comparison
-HVG_GENE_FILE <- file.path(INPUT_TARGET_GENES_DIR, "target_genes_hvg_100.txt")
-RANDOM_GENE_FILE <- file.path(INPUT_TARGET_GENES_DIR, "target_genes_random_100.txt")
+# Use the SAME pre-computed target gene lists across all 3 pipelines for fair comparison.
+# Pre-computed files are provided in the repo under data/target_genes/.
+# Use ABSOLUTE paths (or paths relative to the directory you run Rscript from).
+HVG_GENE_FILE <- "<PATH_TO_HVG_GENE_LIST>"       # e.g., "/abs/path/to/repo/data/target_genes/E7.5_rep2/target_genes_hvg_100.txt"
+RANDOM_GENE_FILE <- "<PATH_TO_RANDOM_GENE_LIST>"  # e.g., "/abs/path/to/repo/data/target_genes/E7.5_rep2/target_genes_random_100.txt"
 
 # Which gene sets to analyze
 MODEL_GENE_SET <- "both"  # Options: "HVG", "Random_genes", "both"
@@ -95,6 +102,8 @@ MODEL_GENE_SET <- "both"  # Options: "HVG", "Random_genes", "both"
 # For ATAC-only, features are peaks within a genomic window of the target gene
 GENE_WINDOW_KB <- 250  # ±250kb window from TSS
 MIN_PEAKS_PER_GENE <- 1
+N_HVG_GENES <- 100     # Number of HVGs to consider for target genes
+SEED_FEATURES <- 123   # Random seed for feature extraction
 
 # ============================================================================
 # SECTION 9: MODEL TRAINING PARAMETERS
@@ -117,29 +126,14 @@ NN_GRID_UNITS <- c(256)
 NN_GRID_DROPOUT <- c(0, 0.1)
 NN_GRID_BATCH <- c(128, 256)
 
-
 # Conda environment for TensorFlow/Keras
 CONDA_ENV_NAME <- "your_conda_env"
 
 # ============================================================================
-# SECTION 10: COMPUTATIONAL RESOURCES & SLURM SETTINGS
+# SECTION 10: COMPUTATIONAL RESOURCES
 # ============================================================================
 N_CORES <- 4
 MAX_CORES_TRAINING <- 32
-
-CONDA_ENV_R <- "r-bioc-43"
-CONDA_ENV_PYTHON <- "python_env"
-
-SLURM_PARTITION <- "compute"
-
-SLURM_RESOURCES <- list(
-  step_030 = list(cpus = 32, mem_gb = 128, time_hours = 6, job_name = "metacell"),
-  step_040 = list(cpus = 32, mem_gb = 128, time_hours = 8, job_name = "feature_extract"),
-  step_050 = list(cpus = 32, mem_gb = 200, time_hours = 12, job_name = "model_linear"),
-  step_060 = list(cpus = 16, mem_gb = 200, time_hours = 24, job_name = "model_nn")
-)
-
-SLURM_LOG_DIR <- "~/scATAC_only/jobs/logs"
 
 # ============================================================================
 # SECTION 11: RESULTS OUTPUT DIRECTORIES
@@ -155,7 +149,7 @@ NN_ARCH_LABEL <- switch(
 )
 
 OUTPUT_MODELS_LINEAR_DIR <- file.path(BASE_RESULTS_DIR, "models/LINEAR_AND_TREE_BASED", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
-OUTPUT_MODELS_NN_DIR <- file.path(BASE_RESULTS_DIR, "models/NEURAL_NETWORKS", SAMPLE_NAME, DIMRED_METHOD_SUFFIX, NN_ARCH_LABEL)
+OUTPUT_MODELS_NN_DIR <- file.path(BASE_RESULTS_DIR, "models/NEURAL_NETWORKS", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
 OUTPUT_FIGURES_DIR <- file.path(BASE_RESULTS_DIR, "figures", SAMPLE_NAME, DIMRED_METHOD_SUFFIX)
 
 # ============================================================================
@@ -204,6 +198,17 @@ print_config <- function() {
   cat("Input Seurat:", INPUT_SEURAT_SPLITS, "\n\n")
 }
 
+print_output_directories <- function() {
+  cat("\n=======================================================================\n")
+  cat("OUTPUT DIRECTORIES\n")
+  cat("=======================================================================\n\n")
+  cat("  Metacells:       ", path.expand(OUTPUT_METACELLS_DIR), "\n")
+  cat("  Features:        ", path.expand(OUTPUT_FEATURES_DIR), "\n")
+  cat("  Linear Models:   ", path.expand(OUTPUT_MODELS_LINEAR_DIR), "\n")
+  cat("  Neural Networks: ", path.expand(OUTPUT_MODELS_NN_DIR), "\n")
+  cat("  Figures:         ", path.expand(OUTPUT_FIGURES_DIR), "\n\n")
+}
+
 validate_config <- function() {
   errors <- c()
   if (!file.exists(path.expand(INPUT_SEURAT_SPLITS))) {
@@ -220,105 +225,6 @@ validate_config <- function() {
 cat("\n[CONFIG] Loaded ATAC-only configuration for sample:", SAMPLE_NAME, "\n")
 cat("[CONFIG] Species:", SPECIES, "| Genome:", GENOME, "\n\n")
 
-# ============================================================================
-# SBATCH GENERATION (RNA-config style)
-# ============================================================================
 
-generate_sbatch <- function(step_name, script_name, output_dir = ".",
-                            conda_env = NULL, extra_args = "",
-                            array_range = NULL, is_python = FALSE) {
-
-  if (!step_name %in% names(SLURM_RESOURCES)) {
-    stop(sprintf("Unknown step: %s. Available: %s",
-                 step_name, paste(names(SLURM_RESOURCES), collapse = ", ")))
-  }
-  res <- SLURM_RESOURCES[[step_name]]
-
-  if (is.null(conda_env)) {
-    conda_env <- if (is_python) CONDA_ENV_PYTHON else CONDA_ENV_R
-  }
-
-  hours <- floor(res$time_hours)
-  minutes <- round((res$time_hours - hours) * 60)
-  time_str <- sprintf("%02d:%02d:00", hours, minutes)
-
-  log_dir <- file.path(path.expand(SLURM_LOG_DIR), res$job_name)
-  if (!dir.exists(log_dir)) dir.create(log_dir, recursive = TRUE)
-
-  use_gpu <- !is.null(res$gpu) && isTRUE(res$gpu)
-  gpu_count <- if (!is.null(res$gpu_count)) res$gpu_count else 1
-
-  sbatch_lines <- c(
-    "#!/bin/bash",
-    sprintf("#SBATCH --job-name=%s_%s", res$job_name, SAMPLE_NAME),
-    sprintf("#SBATCH -p %s", if (use_gpu) "gpu" else SLURM_PARTITION),
-    sprintf("#SBATCH --time=%s", time_str),
-    sprintf("#SBATCH --output=%s/%%x_%%j.log", log_dir),
-    sprintf("#SBATCH --error=%s/%%x_%%j.err", log_dir),
-    "#SBATCH -N 1",
-    "#SBATCH --ntasks-per-node=1",
-    sprintf("#SBATCH -c %d", res$cpus),
-    sprintf("#SBATCH --mem=%dG", res$mem_gb)
-  )
-
-  if (use_gpu) sbatch_lines <- c(sbatch_lines, sprintf("#SBATCH --gres=gpu:%d", gpu_count))
-  if (!is.null(array_range)) sbatch_lines <- c(sbatch_lines, sprintf("#SBATCH --array=%s", array_range))
-
-  sbatch_lines <- c(sbatch_lines, "", "set -euo pipefail", "")
-
-  sbatch_lines <- c(sbatch_lines,
-    "# Initialize and activate conda environment",
-    "source ~/miniconda3/etc/profile.d/conda.sh",
-    sprintf("conda activate %s", conda_env),
-    ""
-  )
-
-  if (!is_python) {
-    sbatch_lines <- c(sbatch_lines,
-      "# Set R library paths (conda R)",
-      "export R_LIBS=\"$CONDA_PREFIX/lib/R/library\"",
-      "export R_LIBS_USER=\"$CONDA_PREFIX/lib/R/library\"",
-      "export R_LIBS_SITE=\"\"",
-      ""
-    )
-  }
-
-  run_cmd <- if (is_python) {
-    sprintf("python %s %s", script_name, extra_args)
-  } else {
-    sprintf("Rscript %s %s", script_name, extra_args)
-  }
-
-  sbatch_lines <- c(sbatch_lines,
-    "# Run the script",
-    run_cmd,
-    "",
-    "echo \"Job completed at $(date)\"",
-    "echo \"Exit code: $?\""
-  )
-
-  if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
-  sbatch_filename <- file.path(output_dir, sprintf("%s_%s.sbatch", step_name, SAMPLE_NAME))
-  writeLines(sbatch_lines, sbatch_filename)
-
-  cat(sprintf("Generated: %s\n", sbatch_filename))
-  cat(sprintf("  Resources: %d CPUs, %dG RAM, %s time\n", res$cpus, res$mem_gb, time_str))
-  invisible(sbatch_filename)
-}
-
-generate_all_sbatch <- function(output_dir = ".") {
-  cat("\n=== Generating SLURM sbatch files (scATAC-only) ===\n\n")
-
-  generate_sbatch("step_030", "03_metacell_creation.R", output_dir)
-  generate_sbatch("step_040", "04_feature_extraction.R", output_dir)
-  generate_sbatch("step_050", "05_linear_tree_models.R", output_dir)
-  generate_sbatch("step_060", "06_neural_network.R", output_dir)
- 
-  cat("\nAll sbatch files generated in:", output_dir, "\n\n")
-  cat("Submission order:\n")
-  cat(sprintf("sbatch step_030_%s.sbatch\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_040_%s.sbatch\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_050_%s.sbatch\n", SAMPLE_NAME))
-  cat(sprintf("sbatch step_060_%s.sbatch\n", SAMPLE_NAME))
-  cat("\n")
-}
+# Flag to prevent re-sourcing when called via run_pipeline.R
+CONFIG_LOADED <- TRUE

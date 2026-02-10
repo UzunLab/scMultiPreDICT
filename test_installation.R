@@ -182,7 +182,7 @@ cat("\nTesting configuration templates...\n")
 cat("----------------------------------------------------------\n")
 
 config_templates <- c(
-  "combined/config_template.R",
+  "combined/R/config_template.R",
   "rna_only/config_template.R",
   "atac_only/config_template.R"
 )
@@ -241,7 +241,10 @@ if (tests_failed == 0) {
 
 cat("\n")
 cat("Next steps:\n")
-cat("  1. Copy config_template.R to config.R in your chosen pipeline directory\n")
+cat("  1. Copy config template to config.R in your chosen pipeline directory:\n")
+cat("       combined:  cd combined && cp R/config_template.R config.R\n")
+cat("       rna_only:  cd rna_only && cp config_template.R config.R\n")
+cat("       atac_only: cd atac_only && cp config_template.R config.R\n")
 cat("  2. Edit config.R with your dataset paths\n")
-cat("  3. Run: Rscript run_pipeline.R\n")
+cat("  3. Run: Rscript run_pipeline.R --config config.R\n")
 cat("\n")

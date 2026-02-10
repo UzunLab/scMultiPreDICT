@@ -9,7 +9,7 @@
 #
 # Pipeline Steps:
 #   1. Quality Control - Cell filtering based on RNA/ATAC metrics
-#   2. Data Splitting - Stratified train/validation/test partitioning
+#   2. Data Splitting - Stratified train/validation/test partitioning (uses pre-computed target gene lists)
 #   3. Metacell Creation - k-NN smoothing for noise reduction
 #   4. Feature Extraction - Gene-specific feature matrix construction
 #   5. Model Training - Linear regression and Random Forest models
@@ -31,7 +31,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # Default settings
 config_path <- "config.R"
 start_step <- 1
-stop_step <- 8
+stop_step <- 6
 specific_steps <- NULL
 
 # Argument parsing
@@ -59,13 +59,13 @@ Usage:
 Options:
   --config PATH    Path to configuration file (default: config.R)
   --start N        Begin execution from step N (default: 1)
-  --stop N         Stop execution after step N (default: 8)
+  --stop N         Stop execution after step N (default: 6)
   --steps N,M,...  Execute only specified steps
   --help           Display this help message
 
 Pipeline Steps:
   1: Quality Control
-  2: Data Splitting & Target Gene Selection
+  2: Data Splitting
   3: Metacell Creation
   4: Feature Extraction
   5: Linear and Tree-Based Model Training
@@ -92,7 +92,7 @@ cat("\n")
 # Load configuration
 if (!file.exists(config_path)) {
   stop("Configuration file not found: ", config_path, 
-       "\nPlease copy config_template.R to config.R and modify as needed.")
+       "\nPlease copy R/config_template.R to config.R and modify as needed.")
 }
 
 source(config_path)
@@ -111,10 +111,10 @@ cat(sprintf("\nSteps to execute: %s\n", paste(steps_to_run, collapse = ", ")))
 metacell_script <- switch(
 
   DIM_REDUCTION_METHOD,
-  "pca_lsi" = "R/03_metacell_creation_pca_lsi.R",
-  "wnn" = "R/03_metacell_creation_wnn.R",
-  "multivi" = "R/03_metacell_creation_multivi.R",
-  "scvi_peakvi" = "R/03_metacell_creation_scvi_peakvi.R",
+  "pca_lsi" = "R/03a_metacell_creation_pca_lsi.R",
+  "wnn" = "R/03a_metacell_creation_wnn.R",
+  "multivi" = "R/03a_metacell_creation_multivi.R",
+  "scvi_peakvi" = "R/03a_metacell_creation_scvi_peakvi.R",
   stop(sprintf("Unknown DIM_REDUCTION_METHOD: %s. Valid options: pca_lsi, wnn, multivi, scvi_peakvi", 
                DIM_REDUCTION_METHOD))
 )
@@ -127,7 +127,7 @@ step_info <- list(
   list(name = "Quality Control", 
        script = "R/01_quality_control.R"),
   list(name = "Data Splitting", 
-       script = "R/02_data_splitting.R"),
+       script = "R/02a_data_splitting.R"),
   list(name = sprintf("Metacell Creation (%s)", DIM_REDUCTION_METHOD), 
        script = metacell_script),
   list(name = "Feature Extraction", 

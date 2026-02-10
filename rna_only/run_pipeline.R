@@ -26,7 +26,7 @@ args <- commandArgs(trailingOnly = TRUE)
 # Default settings
 config_path <- "config.R"
 start_step <- 1
-stop_step <- 8
+stop_step <- 4
 specific_steps <- NULL
 
 # Parse arguments
@@ -54,16 +54,16 @@ Usage:
 Options:
   --config PATH    Path to config file (default: config.R)
   --start N        Start from step N (default: 1)
-  --stop N         Stop after step N (default: 8)
+  --stop N         Stop after step N (default: 4)
   --steps N,M,...  Run only specific steps
   --help           Show this help message
 
 Steps:
-  3: Metacell Creation (PCA)
-  4: Feature Extraction
-  5: Model Training (Linear + RF)
-  6: Neural Network Training
-  
+  1: Metacell Creation (PCA)
+  2: Feature Extraction
+  3: Model Training (Linear + RF)
+  4: Neural Network Training
+
 Example:
   Rscript run_pipeline.R --config my_config.R --steps 1,2,3
 ")
@@ -105,7 +105,7 @@ cat(sprintf("\nSteps to run: %s\n", paste(steps_to_run, collapse = ", ")))
 # Define step information
 step_info <- list(
   list(name = "Metacell Creation", 
-       script = "R/03_metacell_creation.R"),
+       script = "R/03a_metacell_creation.R"),
   list(name = "Feature Extraction", 
        script = "R/04_feature_extraction.R"),
   list(name = "Model Training", 

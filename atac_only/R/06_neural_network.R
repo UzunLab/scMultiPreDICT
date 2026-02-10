@@ -8,7 +8,7 @@
 # Requirements:
 #  - `config.R` defines: INPUT_FEATURES_DIR (or OUTPUT_FEATURES_DIR),
 #    OUTPUT_MODELS_NN_DIR, MODEL_GENE_SET, SEED_MODEL, NN_* parameters,
-#    CONDA_ENV_PYTHON, and optional SAMPLE_NAME, DIMRED_METHOD_SUFFIX.
+#    CONDA_ENV_NAME, and optional SAMPLE_NAME, DIMRED_METHOD_SUFFIX.
 #  - Conda env with TensorFlow/Keras installed and accessible to reticulate.
 #
 # Usage:
@@ -18,29 +18,31 @@
 # Record start time
 start_time <- Sys.time()
 
-# Get the directory of this script to source config.R
-get_script_dir <- function() {
-  args <- commandArgs(trailingOnly = FALSE)
-  file_arg <- grep("^--file=", args, value = TRUE)
-  if (length(file_arg) > 0) {
-    return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+if (!exists("CONFIG_LOADED")) {
+  # Get the directory of this script to source config.R
+  get_script_dir <- function() {
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+    }
+    return(".")
   }
-  return(".")
-}
-script_dir <- get_script_dir()
+  script_dir <- get_script_dir()
 
-# Source configuration file
-config_path <- file.path(script_dir, "config.R")
-if (!file.exists(config_path)) {
-  config_path <- "config.R"
-}
+  # Source configuration file
+  config_path <- file.path(script_dir, "config.R")
+  if (!file.exists(config_path)) {
+    config_path <- "config.R"
+  }
 
-if (!file.exists(config_path)) {
-  stop("config.R not found! Please ensure config.R is in the same directory as this script.")
-}
+  if (!file.exists(config_path)) {
+    stop("config.R not found! Please ensure config.R is in the same directory as this script.")
+  }
 
-cat("Loading configuration from:", config_path, "\n")
-source(config_path)
+  cat("Loading configuration from:", config_path, "\n")
+  source(config_path)
+}
 
 # ============================================================================
 # PYTHON / TENSORFLOW ENVIRONMENT
@@ -48,7 +50,7 @@ source(config_path)
 suppressMessages(library(reticulate))
 
 # Use configured conda environment
-use_condaenv(CONDA_ENV_R, required = TRUE)
+use_condaenv(CONDA_ENV_NAME, required = TRUE)
 cat("Python configuration:\n")
 print(py_config())
 

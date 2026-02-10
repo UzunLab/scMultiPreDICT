@@ -19,31 +19,28 @@
 #   2. Run: Rscript 05_linear_tree_models.R
 # ============================================================================
 
-# Get the directory of this script to source config_template.R
-# Use commandArgs() which works reliably with Rscript
-get_script_dir <- function() {
-  args <- commandArgs(trailingOnly = FALSE)
-  file_arg <- grep("^--file=", args, value = TRUE)
-  if (length(file_arg) > 0) {
-    return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+# Source configuration (skip if already loaded by run_pipeline.R)
+if (!exists("CONFIG_LOADED")) {
+  get_script_dir <- function() {
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+    }
+    return(".")
   }
-  # Fallback for interactive use or source()
-  return(".")
+  script_dir <- get_script_dir()
+  
+  config_path <- file.path(script_dir, "config.R")
+  if (!file.exists(config_path)) {
+    config_path <- "config.R"
+  }
+  if (!file.exists(config_path)) {
+    stop("config.R not found! Please copy config_template.R to config.R and edit with your settings.")
+  }
+  cat("Loading configuration from:", config_path, "\n")
+  source(config_path)
 }
-script_dir <- get_script_dir()
-
-# Source configuration file
-config_path <- file.path(script_dir, "config_template.R")
-if (!file.exists(config_path)) {
-  config_path <- "config_template.R"
-}
-
-if (!file.exists(config_path)) {
-  stop("config_template.R not found! Please ensure config_template.R is in the same directory as this script.")
-}
-
-cat("Loading configuration from:", config_path, "\n")
-source(config_path)
 
 # ============================================================================
 # LOAD REQUIRED LIBRARIES
@@ -392,6 +389,17 @@ train_models_for_gene <- function(gene_data, gene_name, gene_set_name, output_ba
   write.csv(top20_per_model, file.path(gene_output_dir, "coefficients_top20.csv"), row.names = FALSE)
   write.csv(rf_importance, file.path(gene_output_dir, "rf_importance.csv"), row.names = FALSE)
   
+  # Trained models
+  if (!is.null(ols)) saveRDS(ols, file.path(gene_output_dir, "model_ols.rds"))
+  if (!is.null(rid)) saveRDS(rid, file.path(gene_output_dir, "model_ridge.rds"))
+  if (!is.null(las)) saveRDS(las, file.path(gene_output_dir, "model_lasso.rds"))
+  if (!is.null(ene)) saveRDS(ene, file.path(gene_output_dir, "model_elasticnet.rds"))
+  if (!is.null(rf)) saveRDS(rf, file.path(gene_output_dir, "model_rf.rds"))
+  
+  # Scaling parameters (needed to preprocess new data for prediction)
+  saveRDS(list(mins = mins, ranges = ranges, zerov = zerov), 
+          file.path(gene_output_dir, "scaling_params.rds"))
+          
   # Metadata
   metadata <- data.frame(
     Gene = gene_name, GeneSet = gene_set_name,

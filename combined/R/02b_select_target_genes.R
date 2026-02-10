@@ -1,12 +1,20 @@
 # ============================================================================
-# Step_02b: Select Target Genes for Prediction (Automated)
+# Step_02b: Select Target Genes for Prediction (OPTIONAL - Standalone Script)
 # ============================================================================
-# Purpose: Select random non-HVG genes to use as prediction targets
-# This runs AFTER Step_020 (splitting) but BEFORE Step_040 (feature extraction)
+# Purpose: Auto-select random non-HVG genes to use as prediction targets.
 #
-# Two gene sets are used for prediction:
-#   1. HVG - Highly variable genes (selected by yourself or use precomputed list)
-#   2. Random - Non-HVG genes with reasonable expression (selected here or use precomputed list)
+# *** This script is NOT part of the default pipeline. ***
+# It is only needed when analyzing NEW datasets that do not have
+# pre-computed target gene lists in data/target_genes/.
+# For published datasets, use the pre-computed files instead.
+#
+# Before running this script, uncomment and set these parameters in config.R:
+#   N_RANDOM_TARGET_GENES <- 100
+#   TARGET_MIN_DETECTION  <- 5
+#   TARGET_MAX_DETECTION  <- 95
+#   TARGET_MIN_MEAN_EXPR  <- 0.1
+#   SEED_TARGET_GENES     <- 2025
+#   OUTPUT_TARGET_GENES_DIR <- file.path(BASE_OUTPUT_DIR, "target_genes", SAMPLE_NAME)
 #
 # Strategy:
 # - Exclude highly variable genes (HVGs) used for PCA/dimensionality reduction
@@ -14,38 +22,36 @@
 # - Avoid very rare or very sparse genes
 # - Save gene list for downstream prediction tasks
 #
-# Input: Seurat object with split labels from Step_020
+# Input: Seurat object with split labels from Step 02a
 # Output: Target gene list (text file) and summary (CSV)
 #
 # Usage:
-#   Rscript 02b_select_target_genes.R
+#   cd combined
+#   Rscript R/02b_select_target_genes.R
 # ============================================================================
 
-# Get the directory of this script to source config.R
-# Use commandArgs() which works reliably with Rscript
-get_script_dir <- function() {
-  args <- commandArgs(trailingOnly = FALSE)
-  file_arg <- grep("^--file=", args, value = TRUE)
-  if (length(file_arg) > 0) {
-    return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+# Source configuration (skip if already loaded by run_pipeline.R)
+if (!exists("CONFIG_LOADED")) {
+  get_script_dir <- function() {
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+    }
+    return(".")
   }
-  # Fallback for interactive use or source()
-  return(".")
+  script_dir <- get_script_dir()
+  
+  config_path <- file.path(script_dir, "config.R")
+  if (!file.exists(config_path)) {
+    config_path <- "config.R"
+  }
+  if (!file.exists(config_path)) {
+    stop("config.R not found! Please copy config_template.R to config.R and edit with your settings.")
+  }
+  cat("Loading configuration from:", config_path, "\n")
+  source(config_path)
 }
-script_dir <- get_script_dir()
-
-# Source configuration file
-config_path <- file.path(script_dir, "config_template.R")
-if (!file.exists(config_path)) {
-  config_path <- "config_template.R"
-}
-
-if (!file.exists(config_path)) {
-  stop("config_template.R not found! Please ensure config_template.R is in the same directory as this script.")
-}
-
-cat("Loading configuration from:", config_path, "\n")
-source(config_path)
 
 # ============================================================================
 # LOAD REQUIRED LIBRARIES

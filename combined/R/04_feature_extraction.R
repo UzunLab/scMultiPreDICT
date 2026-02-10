@@ -18,31 +18,28 @@
 #   2. Run: Rscript 04_feature_extraction.R
 # ============================================================================
 
-# Get the directory of this script to source config.R
-# Use commandArgs() which works reliably with Rscript
-get_script_dir <- function() {
-  args <- commandArgs(trailingOnly = FALSE)
-  file_arg <- grep("^--file=", args, value = TRUE)
-  if (length(file_arg) > 0) {
-    return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+# Source configuration (skip if already loaded by run_pipeline.R)
+if (!exists("CONFIG_LOADED")) {
+  get_script_dir <- function() {
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+    }
+    return(".")
   }
-  # Fallback for interactive use or source()
-  return(".")
+  script_dir <- get_script_dir()
+  
+  config_path <- file.path(script_dir, "config.R")
+  if (!file.exists(config_path)) {
+    config_path <- "config.R"
+  }
+  if (!file.exists(config_path)) {
+    stop("config.R not found! Please copy config_template.R to config.R and edit with your settings.")
+  }
+  cat("Loading configuration from:", config_path, "\n")
+  source(config_path)
 }
-script_dir <- get_script_dir()
-
-# Source configuration file
-config_path <- file.path(script_dir, "config_template.R")
-if (!file.exists(config_path)) {
-  config_path <- "config_template.R"
-}
-
-if (!file.exists(config_path)) {
-  stop("config_template.R not found! Please ensure config_template.R is in the same directory as this script.")
-}
-
-cat("Loading configuration from:", config_path, "\n")
-source(config_path)
 
 # ============================================================================
 # LOAD REQUIRED LIBRARIES
@@ -142,7 +139,6 @@ gene_window_kb <- GENE_WINDOW_KB
 min_peaks_per_gene <- MIN_PEAKS_PER_GENE
 n_hvg_genes <- N_HVG_GENES
 n_hvg_features <- N_HVG_FEATURES
-target_gene_file <- TARGET_GENE_FILE
 seed <- SEED_FEATURES
 
 set.seed(seed)
@@ -1163,16 +1159,16 @@ cat("Creating Plot 13: Gene set comparison...\n")
 set_summary <- data.frame(
   gene_set = names(all_gene_features),
   n_genes = sapply(all_gene_features, length),
-  mean_peaks = sapply(all_gene_features, function(gf) mean(sapply(gf, function(x) x$n_peaks))),
-  mean_total = sapply(all_gene_features, function(gf) mean(sapply(gf, function(x) x$n_total_features)))
+  median_peaks = sapply(all_gene_features, function(gf) median(sapply(gf, function(x) x$n_peaks))),
+  median_total = sapply(all_gene_features, function(gf) median(sapply(gf, function(x) x$n_total_features)))
 )
 
 set_summary_long <- reshape2::melt(set_summary, id.vars = "gene_set",
                                     variable.name = "metric", 
                                     value.name = "value")
 set_summary_long$metric <- factor(set_summary_long$metric,
-                                   levels = c("n_genes", "mean_peaks", "mean_total"),
-                                   labels = c("Number of Genes", "Mean Peaks/Gene", "Mean Total Features"))
+                                   levels = c("n_genes", "median_peaks", "median_total"),
+                                   labels = c("Number of Genes", "Median Peaks/Gene", "Median Total Features"))
 
 p13 <- ggplot(set_summary_long, aes(x = gene_set, y = value, fill = gene_set)) +
   geom_col(alpha = 0.9, color = "black", linewidth = 0.5) +
@@ -1203,8 +1199,8 @@ cat("Creating Plot 14: Summary panel...\n")
 # Build summary for all gene sets
 set_summary_text <- paste(sapply(names(all_gene_features), function(set_name) {
   gf <- all_gene_features[[set_name]]
-  sprintf("  %s: %d genes, mean %.1f peaks/gene", 
-          set_name, length(gf), mean(sapply(gf, function(x) x$n_peaks)))
+  sprintf("  %s: %d genes, median %.1f peaks/gene", 
+          set_name, length(gf), median(sapply(gf, function(x) x$n_peaks)))
 }), collapse = "\n")
 
 summary_text <- paste0(
@@ -1221,8 +1217,8 @@ summary_text <- paste0(
   sprintf("  Validation cells: %d\n", length(smoothed_val$cells)),
   sprintf("  Test cells: %d\n\n", length(smoothed_test$cells)),
   sprintf("Primary Set (%s) Statistics:\n", main_set),
-  sprintf("  Mean peaks/gene: %.1f\n", mean(sapply(gene_features, function(x) x$n_peaks))),
-  sprintf("  Mean total features/gene: %.1f\n", mean(sapply(gene_features, function(x) x$n_total_features)))
+  sprintf("  Median peaks/gene: %.1f\n", median(sapply(gene_features, function(x) x$n_peaks))),
+  sprintf("  Median total features/gene: %.1f\n", median(sapply(gene_features, function(x) x$n_total_features)))
 )
 
 p14 <- ggplot() +

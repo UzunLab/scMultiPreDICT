@@ -65,24 +65,34 @@ fragments.tsv.gz
 fragments.tsv.gz.tbi
 
 # ============================================================================
-# Output directories
+# Output directories (created during pipeline runs)
 # ============================================================================
 output/
 results/
 logs/
 figures/
-models/
+test_data/
 
 # Ignore data directory except for target_genes (needed for reproducibility)
 data/*
+!data/target_genes/
+
+# Keep pre-trained models directory for reproducibility
+# (models/ at repo root is tracked, but models in output dirs are not)
+!models/
 
 # User-specific config (template should be committed, actual config should not)
 config.R
 
+# User-specific cluster settings (template should be committed)
+submit_settings.sh
+
+# User-created per-dataset config files
+**/datasets/*.config.R
+
 # ============================================================================
 # SLURM job files
 # ============================================================================
-*.sbatch
 slurm-*.out
 *.log
 *.err
@@ -115,9 +125,15 @@ checkpoints/
 saved_models/
 
 # ============================================================================
+# Unused utility modules (kept locally but not in repo)
+# ============================================================================
+**/R/utils/
+
+# ============================================================================
 # Keep certain files even if matching above patterns
 # ============================================================================
 !config_template.R
-!slurm/templates/*.sbatch
+!submit_settings.template.sh
+!datasets/README.md
 !examples/*.csv
 !examples/*.txt

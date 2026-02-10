@@ -13,9 +13,11 @@ suppressPackageStartupMessages({
 })
 
 # ---------------- Load Config ----------------
-config_file <- "config.R"
-if (!file.exists(config_file)) stop("ERROR: config.R not found in working directory.")
-source(config_file)
+if (!exists("CONFIG_LOADED")) {
+  config_file <- "config.R"
+  if (!file.exists(config_file)) stop("ERROR: config.R not found in working directory.")
+  source(config_file)
+}
 
 # ----------------- Fallbacks / normalize config names -----------------
 # Allow this automated script to run using the central `config.R` variables
@@ -106,14 +108,14 @@ cat(sprintf("Test: %d cells\n", length(smoothed_test$cells)))
 # ===============Add RNA Expression Data=========================
 cat("\n=== Adding RNA expression data to smoothed structures ===\n")
 
-# RNA metacell directory - should be set in config.R
+# RNA metacell directory - should be set in config.R (Section 2b)
 # For ATAC-only pipeline, RNA data is needed as the target variable (Y)
-# Update RNA_METACELL_DIR in config.R to point to your RNA-only pipeline output
-if (!exists("RNA_METACELL_DIR")) {
-  # Default: assume RNA-only pipeline output is in a parallel directory
-  RNA_METACELL_DIR <- gsub("scATAC_only", "scRNA_only", BASE_OUTPUT_DIR)
+if (!exists("RNA_METACELL_DIR") || !nzchar(RNA_METACELL_DIR)) {
+  stop("RNA_METACELL_DIR is not set in your config file.\n",
+       "  Set it to the BASE_OUTPUT_DIR of your RNA-only pipeline run.\n",
+       "  Example: RNA_METACELL_DIR <- \"~/scMultiPreDICT_output/rna_only/processed/\"")
 }
-input_dir_rna <- file.path(RNA_METACELL_DIR, "metacells", SAMPLE_NAME, "pca")
+input_dir_rna <- file.path(path.expand(RNA_METACELL_DIR), "metacells", SAMPLE_NAME, "pca")
   
   # Check if RNA assay exists
 if (!"RNA" %in% names(seurat_obj@assays)) {

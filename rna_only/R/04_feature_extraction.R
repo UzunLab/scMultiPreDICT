@@ -18,29 +18,31 @@
 #   2. Run: Rscript 04_feature_extraction.R
 # ============================================================================
 
-# Get the directory of this script to source config.R
-get_script_dir <- function() {
-  args <- commandArgs(trailingOnly = FALSE)
-  file_arg <- grep("^--file=", args, value = TRUE)
-  if (length(file_arg) > 0) {
-    return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+if (!exists("CONFIG_LOADED")) {
+  # Get the directory of this script to source config.R
+  get_script_dir <- function() {
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+    }
+    return(".")
   }
-  return(".")
-}
-script_dir <- get_script_dir()
+  script_dir <- get_script_dir()
 
-# Source configuration file
-config_path <- file.path(script_dir, "config.R")
-if (!file.exists(config_path)) {
-  config_path <- "config.R"
-}
+  # Source configuration file
+  config_path <- file.path(script_dir, "config.R")
+  if (!file.exists(config_path)) {
+    config_path <- "config.R"
+  }
 
-if (!file.exists(config_path)) {
-  stop("config.R not found! Please ensure config.R is in the same directory as this script.")
-}
+  if (!file.exists(config_path)) {
+    stop("config.R not found! Please ensure config.R is in the same directory as this script.")
+  }
 
-cat("Loading configuration from:", config_path, "\n")
-source(config_path)
+  cat("Loading configuration from:", config_path, "\n")
+  source(config_path)
+}
 
 # ============================================================================
 # LOAD REQUIRED LIBRARIES

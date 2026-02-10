@@ -11,29 +11,28 @@
 #   Rscript 03b_export_to_mudata.R
 # ============================================================================
 
-# Get the directory of this script
-get_script_dir <- function() {
-  args <- commandArgs(trailingOnly = FALSE)
-  file_arg <- grep("^--file=", args, value = TRUE)
-  if (length(file_arg) > 0) {
-    return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+# Source configuration (skip if already loaded by run_pipeline.R)
+if (!exists("CONFIG_LOADED")) {
+  get_script_dir <- function() {
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      return(dirname(normalizePath(sub("^--file=", "", file_arg))))
+    }
+    return(".")
   }
-  return(".")
+  script_dir <- get_script_dir()
+  
+  config_path <- file.path(script_dir, "config.R")
+  if (!file.exists(config_path)) {
+    config_path <- "config.R"
+  }
+  if (!file.exists(config_path)) {
+    stop("config.R not found! Please copy config_template.R to config.R and edit with your settings.")
+  }
+  cat("Loading configuration from:", config_path, "\n")
+  source(config_path)
 }
-script_dir <- get_script_dir()
-
-# Source configuration file
-config_path <- file.path(script_dir, "config_template.R")
-if (!file.exists(config_path)) {
-  config_path <- "config_template.R"
-}
-
-if (!file.exists(config_path)) {
-  stop("config_template.R not found! Please ensure config_template.R is in the same directory as this script.")
-}
-
-cat("Loading configuration from:", config_path, "\n")
-source(config_path)
 
 # ============================================================================
 # LOAD REQUIRED LIBRARIES
@@ -258,4 +257,4 @@ cat(sprintf("  - %s/convert_to_mudata.py\n", export_dir))
 cat("\nExpected MuData output:\n")
 cat(sprintf("  - %s/%s_seurat_obj_with_splits_mu.h5mu\n", OUTPUT_SPLITS_DIR, SAMPLE_NAME))
 
-cat("\nNext step: 03_metacell_creation_scvi_peakvi.R\n")
+cat("\nNext step: 03a_metacell_creation_scvi_peakvi.R\n")
