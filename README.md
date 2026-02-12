@@ -221,7 +221,7 @@ DIM_REDUCTION_METHOD <- "pca_lsi"  # Options: "pca_lsi", "wnn", "scvi_peakvi", "
 
 #### 3. Run the Pipeline
 
-**Option A: Run all steps in one go (serial) for one datatset**
+**Option A: Run all steps for one datatset**
 
 ```bash
 cd combined
@@ -232,7 +232,7 @@ Rscript run_pipeline.R --config config.R --steps 1,2,3
 Rscript run_pipeline.R --config config.R --start 3 --stop 5
 ```
 
-**Option B: Multi-dataset submission (recommended for HPC)** — see [Running Multiple Datasets](#running-multiple-datasets) below.
+**Option B: Multi-dataset submission** — see [Running Multiple Datasets](#running-multiple-datasets) below.
 
 ### Running Single-Modality Pipelines
 
