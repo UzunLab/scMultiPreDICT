@@ -79,7 +79,7 @@ data/*
 
 # Keep pre-trained models directory for reproducibility
 # (models/ at repo root is tracked, but models in output dirs are not)
-!models/
+models/*
 
 # User-specific config (template should be committed, actual config should not)
 config.R
