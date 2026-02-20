@@ -41,7 +41,6 @@ cran_packages <- c(
   "viridis",
   "scales",
   "ggrepel",
-  "Cairo",
   "RColorBrewer",
   "cowplot",
   "reshape2",
