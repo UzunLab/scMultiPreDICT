@@ -37,19 +37,15 @@ cran_packages <- c(
   "viridis",
   "scales",
   "ggrepel",
-  "Cairo",
   "RColorBrewer",
   "cowplot",
   "reshape2",
   
   # Single-cell analysis
-  "Seurat",
-  "Matrix",
   
   # Machine learning
   "glmnet",
   "ranger",
-  "caret",
   
   # Utilities
   "RANN",
@@ -72,23 +68,173 @@ for (pkg in cran_packages) {
 }
 
 # ============================================================================
+# Seurat (CRAN first, GitHub fallback)
+# ============================================================================
+
+install_matrix <- function() {
+  if (requireNamespace("Matrix", quietly = TRUE)) {
+    cat("  Already installed: Matrix\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  Installing: Matrix (CRAN)\n")
+  tryCatch({
+    install.packages("Matrix", repos = "https://cloud.r-project.org", quiet = TRUE)
+  }, error = function(e) {
+    cat(sprintf("  CRAN install error for Matrix: %s\n", e$message))
+  })
+
+  if (requireNamespace("Matrix", quietly = TRUE)) {
+    cat("  Matrix installed successfully.\n")
+  } else {
+    cat("  Matrix installation failed.\n")
+  }
+}
+
+install_mass <- function() {
+  if (requireNamespace("MASS", quietly = TRUE)) {
+    cat("  Already installed: MASS\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  Installing: MASS (CRAN)\n")
+  tryCatch({
+    install.packages("MASS", repos = "https://cloud.r-project.org", quiet = TRUE)
+  }, error = function(e) {
+    cat(sprintf("  CRAN install error for MASS: %s\n", e$message))
+  })
+
+  if (requireNamespace("MASS", quietly = TRUE)) {
+    cat("  MASS installed successfully.\n")
+  } else {
+    cat("  MASS installation failed.\n")
+  }
+}
+
+install_caret <- function() {
+  if (requireNamespace("caret", quietly = TRUE)) {
+    cat("  Already installed: caret\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  Installing: caret (CRAN)\n")
+  tryCatch({
+    install.packages("caret", repos = "https://cloud.r-project.org", quiet = TRUE)
+  }, error = function(e) {
+    cat(sprintf("  CRAN install error for caret: %s\n", e$message))
+  })
+
+  if (requireNamespace("caret", quietly = TRUE)) {
+    cat("  caret installed successfully.\n")
+  } else {
+    cat("  caret installation failed.\n")
+  }
+}
+
+install_seurat <- function() {
+  if (requireNamespace("Seurat", quietly = TRUE)) {
+    cat("  Already installed: Seurat\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  Installing: Seurat (CRAN)\n")
+  tryCatch({
+    install.packages("Seurat", repos = "https://cloud.r-project.org", quiet = TRUE)
+  }, error = function(e) {
+    cat(sprintf("  CRAN install error for Seurat: %s\n", e$message))
+  })
+
+  if (requireNamespace("Seurat", quietly = TRUE)) {
+    cat("  Seurat installed successfully from CRAN.\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  CRAN install failed or incomplete. Trying GitHub branch 'seurat5'...\n")
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes", repos = "https://cloud.r-project.org", quiet = TRUE)
+  }
+
+  tryCatch({
+    remotes::install_github("satijalab/seurat", ref = "seurat5", quiet = TRUE, upgrade = "never")
+  }, error = function(e) {
+    cat(sprintf("  GitHub install error for Seurat: %s\n", e$message))
+  })
+
+  if (requireNamespace("Seurat", quietly = TRUE)) {
+    cat("  Seurat installed successfully from GitHub.\n")
+  } else {
+    cat("  Seurat installation failed from both CRAN and GitHub.\n")
+  }
+}
+
+cat("\nInstalling Seurat...\n")
+cat("Ensuring Matrix is installed first...\n")
+install_matrix()
+cat("Ensuring MASS is installed for caret dependencies...\n")
+install_mass()
+cat("Installing caret after Matrix/MASS...\n")
+install_caret()
+install_seurat()
+
+# ============================================================================
 # Bioconductor Packages
 # ============================================================================
 
 if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager")
+  install.packages("BiocManager", repos = "https://cloud.r-project.org", quiet = TRUE)
 }
 
 bioc_packages <- c(
   "Signac",
   "GenomicRanges",
   "GenomeInfoDb",
-  "rtracklayer",
   "IRanges",
   "S4Vectors"
 )
 
+install_rtracklayer <- function() {
+  if (requireNamespace("rtracklayer", quietly = TRUE)) {
+    cat("  Already installed: rtracklayer\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  Installing: rtracklayer (conda: bioconda::bioconductor-rtracklayer)\n")
+  conda_bin <- Sys.which("conda")
+  conda_ok <- FALSE
+
+  if (nzchar(conda_bin)) {
+    conda_status <- tryCatch({
+      system2(conda_bin, args = c("install", "-y", "bioconda::bioconductor-rtracklayer"))
+    }, error = function(e) {
+      cat(sprintf("  Conda install error for rtracklayer: %s\n", e$message))
+      1L
+    })
+    conda_ok <- identical(conda_status, 0L)
+  } else {
+    cat("  Conda not found in PATH; skipping conda install path.\n")
+  }
+
+  if (conda_ok && requireNamespace("rtracklayer", quietly = TRUE)) {
+    cat("  rtracklayer installed successfully via conda.\n")
+    return(invisible(TRUE))
+  }
+
+  cat("  Conda install failed or package still unavailable. Trying BiocManager...\n")
+  tryCatch({
+    BiocManager::install("rtracklayer", update = FALSE, ask = FALSE)
+  }, error = function(e) {
+    cat(sprintf("  BiocManager install error for rtracklayer: %s\n", e$message))
+  })
+
+  if (requireNamespace("rtracklayer", quietly = TRUE)) {
+    cat("  rtracklayer installed successfully via BiocManager.\n")
+  } else {
+    cat("  rtracklayer installation failed from both conda and BiocManager.\n")
+  }
+}
+
 cat("\nInstalling Bioconductor packages...\n")
+install_rtracklayer()
 for (pkg in bioc_packages) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     cat(sprintf("  Installing: %s\n", pkg))
@@ -138,7 +284,7 @@ cat("\n============================================================\n")
 cat("Installation Verification\n")
 cat("============================================================\n")
 
-all_packages <- c(cran_packages, bioc_packages)
+all_packages <- c("Seurat", "Matrix", "MASS", "caret", "rtracklayer", cran_packages, bioc_packages)
 missing <- c()
 
 for (pkg in all_packages) {
