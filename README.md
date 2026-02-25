@@ -89,17 +89,28 @@ git clone https://github.com/UzunLab/scMultiPreDICT.git
 cd scMultiPreDICT
 ```
 
-### 2. Install R Dependencies
+### 2. Create and Activate a Clean Conda Environment (Recommended)
+
+```bash
+conda create -n scmulti -y -c conda-forge -c bioconda --strict-channel-priority \
+  python=3.10 r-base=4.3 sed coreutils grep gawk findutils zlib libzlib libxml2 libcurl openssl git
+
+conda activate scmulti
+```
+
+> **Why this matters:** Some HPC environments have partial shell toolchains in custom envs. Including `sed/coreutils/grep/gawk/findutils` prevents known `Rscript` launcher errors.
+
+### 3. Install R Dependencies
 
 ```bash
 # Install with mouse annotation packages
-Rscript combined/install_packages.R --species=mouse
+Rscript combined/install_packages.R --species=mouse --lib-path-mode=auto
 
 # Install with human annotation packages
-Rscript combined/install_packages.R --species=human
+Rscript combined/install_packages.R --species=human --lib-path-mode=auto
 
 # Install core packages only (add species packages later)
-Rscript combined/install_packages.R
+Rscript combined/install_packages.R --species=skip --lib-path-mode=auto
 ```
 
 Or run interactively in R:
@@ -126,20 +137,37 @@ BiocManager::install("EnsDb.Mmusculus.v79")     # Mouse
 BiocManager::install("EnsDb.Hsapiens.v86")      # Human
 ```
 
-### 3. Install Python Dependencies (for neural networks and autoencoder methods)
+### 4. Install Python Dependencies (for neural networks and autoencoder methods)
 
 ```bash
 pip install -r requirements.txt
 ```
 > **Note:** Neural network training uses TensorFlow/Keras via Python (through the `reticulate` R package), not the R keras package.
 
-### 4. Verify Installation
+### 5. Verify Installation
 
 ```bash
 Rscript test_installation.R
 ```
 
 This checks all required R and Python dependencies and reports any missing packages.
+
+### 6. Clear Common Test Warnings (Optional)
+
+If `test_installation.R` reports warnings for species annotation packages or Python deep-learning tools:
+
+```bash
+# Install species annotation packages (pick one species)
+Rscript combined/install_packages.R --species=mouse --lib-path-mode=auto
+# or
+Rscript combined/install_packages.R --species=human --lib-path-mode=auto
+
+# Install optional Python packages used by Step 6 and autoencoder methods
+pip install tensorflow scvi-tools
+
+# Re-run verification
+Rscript test_installation.R
+```
 
 
 ## Quick Start (Single Dataset)
