@@ -17,6 +17,26 @@ cat("============================================================\n")
 cat("         scMultiPreDICT Installation Test                   \n")
 cat("============================================================\n\n")
 
+# Keep package resolution within active conda env when available.
+conda_prefix <- Sys.getenv("CONDA_PREFIX", unset = "")
+if (nzchar(conda_prefix)) {
+  conda_r_lib <- file.path(conda_prefix, "lib", "R", "library")
+  if (dir.exists(conda_r_lib)) {
+    old_paths <- .libPaths()
+    conda_root_norm <- normalizePath(conda_prefix, mustWork = FALSE)
+    old_norm <- vapply(old_paths, normalizePath, FUN.VALUE = character(1), mustWork = FALSE)
+    has_non_conda_paths <- any(!startsWith(old_norm, conda_root_norm))
+
+    if (has_non_conda_paths) {
+      .libPaths(conda_r_lib)
+      Sys.setenv(R_LIBS_USER = conda_r_lib)
+      cat("Using conda-isolated R library path for testing.\n")
+      cat(sprintf("  Previous .libPaths():\n    %s\n", paste(old_paths, collapse = "\n    ")))
+      cat(sprintf("  Current .libPaths():\n    %s\n\n", paste(.libPaths(), collapse = "\n    ")))
+    }
+  }
+}
+
 # Track test results
 tests_passed <- 0
 tests_failed <- 0
